@@ -5,14 +5,17 @@ WORKDIR /var/www/html
 RUN apt-get update && apt-get install -y \
     git \
     curl \
+    wget \
     libpng-dev \
     libonig-dev \
     libxml2-dev \
     zip \
     unzip \
-    libzip-dev
+    libzip-dev \
+ && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+RUN pecl install xdebug \
+ && docker-php-ext-enable xdebug
 
 RUN docker-php-ext-install \
     pdo_mysql \
@@ -28,13 +31,21 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 COPY . .
 
-# RUN composer install --no-dev --no-scripts --no-autoloader
-
-# RUN composer dump-autoload --optimize
-
 RUN chown -R www-data:www-data /var/www/ \
     && chmod -R 755 /var/www/
 
-EXPOSE 9000
+RUN wget https://phar.phpunit.de/phpunit.phar && \
+    chmod +x phpunit.phar && \
+    mv phpunit.phar /usr/local/bin/phpunit
 
+RUN apt-get update && apt-get install -y default-jre && apt-get clean
+
+RUN wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006.zip && \
+    unzip sonar-scanner-cli-5.0.1.3006.zip -d /opt && \
+    mv /opt/sonar-scanner-5.0.1.3006 /opt/sonar-scanner && \
+    rm sonar-scanner-cli-5.0.1.3006.zip
+
+ENV PATH="/opt/sonar-scanner/bin:${PATH}"
+
+EXPOSE 9000
 CMD ["php-fpm"]

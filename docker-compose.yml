@@ -10,9 +10,54 @@ services:
     working_dir: /var/www
     volumes:
       - ./pastel360-api:/var/www
+      - ./docker/extensions/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini
+      - ./logs/xdebug:/var/log
+    environment:
+      - XDEBUG_MODE=coverage
+      - XDEBUG_CONFIG="client_host=host.docker.internal"
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    depends_on:
+      - sonarqube
     networks:
-      - web_net
+      - net
+
+  postgresql:
+    image: postgres:15
+    ports:
+      - '5444:5432'
+    environment:
+      POSTGRES_USER: sonarqube
+      POSTGRES_PASSWORD: sonarpass
+      POSTGRES_DB: sonar
+    volumes:
+      - postgresql_data:/var/lib/postgresql/data
+    networks:
+      - net
+
+  sonarqube:
+    image: sonarqube:10-community
+    ports:
+      - '9999:9000'
+    environment:
+      SONAR_JDBC_URL: jdbc:postgresql://postgresql:5432/sonar
+      SONAR_JDBC_USERNAME: sonarqube
+      SONAR_JDBC_PASSWORD: sonarpass
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_logs:/opt/sonarqube/logs
+      - sonarqube_extensions:/opt/sonarqube/extensions
+    depends_on:
+      - postgresql
+    networks:
+      - net
 
 networks:
-  web_net:
+  net:
     driver: bridge
+
+volumes:
+  sonarqube_data:
+  sonarqube_logs:
+  sonarqube_extensions:
+  postgresql_data:
