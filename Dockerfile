@@ -12,13 +12,16 @@ RUN apt-get update && apt-get install -y \
     zip \
     unzip \
     libzip-dev \
+    libpq-dev \
+    postgresql-client \ 
  && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN pecl install xdebug \
  && docker-php-ext-enable xdebug
 
 RUN docker-php-ext-install \
-    pdo_mysql \
+    pdo_pgsql \
+    pgsql \
     mbstring \
     exif \
     pcntl \
@@ -31,8 +34,8 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 COPY . .
 
-RUN chown -R www-data:www-data /var/www/ \
-    && chmod -R 755 /var/www/
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 755 /var/www/html
 
 RUN wget https://phar.phpunit.de/phpunit.phar && \
     chmod +x phpunit.phar && \
