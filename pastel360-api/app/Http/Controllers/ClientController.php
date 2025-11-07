@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ClientModel;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use App\Http\Requests\ClientRequest;
+use App\Repositories\Contracts\ClientRepositoryInterface;
 
 /**
  * @OA\Schema(
@@ -27,6 +27,10 @@ use Illuminate\Http\JsonResponse;
 class ClientController extends Controller
 {
 
+    public function __construct(
+        private ClientRepositoryInterface $clientRepository
+    ) {}
+
     /**
      * @OA\Get(
      *     path="/api/clients",
@@ -41,7 +45,7 @@ class ClientController extends Controller
      */
     public function index(): JsonResponse
     {
-        $clients = ClientModel::all();
+        $clients = $this->clientRepository->all();
         return response()->json($clients);
     }
 
@@ -73,21 +77,9 @@ class ClientController extends Controller
      *     @OA\Response(response=422, description="Validação falhou")
      * )
      */
-    public function store(Request $request): JsonResponse
+    public function store(ClientRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'mail' => 'required|email|unique:clients,mail',
-            'phone' => 'required|string|max:20',
-            'birthdate' => 'required|date',
-            'place' => 'required|string|max:255',
-            'number' => 'required|string|max:10',
-            'zipcode' => 'required|string|max:9',
-            'district' => 'required|string|max:255',
-            'complement' => 'nullable|string|max:255'
-        ]);
-
-        $client = ClientModel::create($validated);
+        $client = $this->clientRepository->create($request->validated());
         return response()->json($client, 201);
     }
 
@@ -110,8 +102,9 @@ class ClientController extends Controller
      *     @OA\Response(response=404, description="Cliente não encontrado")
      * )
      */
-    public function show(ClientModel $client): JsonResponse
+    public function show(int $id): JsonResponse
     {
+        $client = $this->clientRepository->find($id);
         return response()->json($client);
     }
 
@@ -149,21 +142,9 @@ class ClientController extends Controller
      *     @OA\Response(response=422, description="Validação falhou")
      * )
      */
-    public function update(Request $request, ClientModel $client): JsonResponse
+    public function update(ClientRequest $request, int $id): JsonResponse
     {
-        $validated = $request->validate([
-            'name' => 'sometimes|string|max:255',
-            'mail' => 'sometimes|email|unique:clients,mail,' . $client->id,
-            'phone' => 'sometimes|string|max:20',
-            'birthdate' => 'sometimes|date',
-            'place' => 'sometimes|string|max:255',
-            'number' => 'sometimes|string|max:10',
-            'zipcode' => 'sometimes|string|max:9',
-            'district' => 'sometimes|string|max:255',
-            'complement' => 'nullable|string|max:255'
-        ]);
-
-        $client->update($validated);
+        $client = $this->clientRepository->update($id, $request->validated());
         return response()->json($client);
     }
 
@@ -185,9 +166,9 @@ class ClientController extends Controller
      *     @OA\Response(response=404, description="Cliente não encontrado")
      * )
      */
-    public function destroy(ClientModel $client): JsonResponse
+    public function destroy(int $id): JsonResponse
     {
-        $client->delete();
+        $this->clientRepository->delete($id);
         return response()->json(null, 204);
     }
 }
