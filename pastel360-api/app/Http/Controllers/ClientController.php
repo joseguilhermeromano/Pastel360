@@ -24,7 +24,7 @@ use Illuminate\Http\JsonResponse;
  *     @OA\Property(property="updated_at", type="string", format="date-time")
  * )
  */
-class ClientController
+class ClientController extends Controller
 {
 
     /**

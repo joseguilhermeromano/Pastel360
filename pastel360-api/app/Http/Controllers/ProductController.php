@@ -21,7 +21,7 @@ use Illuminate\Http\JsonResponse;
  *     @OA\Property(property="updated_at", type="string", format="date-time")
  * )
  */
-class ProductController
+class ProductController extends Controller
 {
 
     /**
