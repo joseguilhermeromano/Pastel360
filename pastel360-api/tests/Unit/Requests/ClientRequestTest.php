@@ -40,7 +40,7 @@ class ClientRequestTest extends TestCase
         $this->assertTrue($validator->passes());
     }
 
-    public function test_client_store_validation_fails_if_email_exists()
+    public function test_client_store_validation_fails_if_mail_exists()
     {
         $verifier = Mockery::mock(DatabasePresenceVerifier::class);
         $verifier->shouldReceive('getCount')->andReturn(1);
@@ -61,5 +61,12 @@ class ClientRequestTest extends TestCase
 
         $this->assertTrue($validator->fails());
         $this->assertArrayHasKey('mail', $validator->errors()->toArray());
+    }
+
+    public function test_client_request_authorize_allows_access()
+    {
+        $request = new ClientRequest();
+
+        $this->assertTrue($request->authorize());
     }
 }
