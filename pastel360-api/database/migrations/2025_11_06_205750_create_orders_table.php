@@ -24,7 +24,7 @@ return new class extends Migration
             $table->integer('quantity')->default(1);
             $table->decimal('unit_value', 10, 2);
             $table->decimal('total_value', 10, 2);
-            $table->enum('status', ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled'])->default('pending');
+            $table->enum('status', ['pending', 'approved', 'delivered', 'cancelled'])->default('pending');
             $table->text('notes')->nullable();
             $table->timestamps();
             $table->softDeletes();

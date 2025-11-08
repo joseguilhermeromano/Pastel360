@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ProductModel;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use App\Http\Requests\ProductRequest;
+use App\Repositories\Contracts\ProductRepositoryInterface;
 
 /**
  * @OA\Schema(
@@ -24,6 +24,10 @@ use Illuminate\Http\JsonResponse;
 class ProductController extends Controller
 {
 
+    public function __construct(
+        private ProductRepositoryInterface $productRepository
+    ) {}
+
     /**
      * @OA\Get(
      *     path="/api/products",
@@ -38,7 +42,7 @@ class ProductController extends Controller
      */
     public function index(): JsonResponse
     {
-        $products = ProductModel::all();
+        $products = $this->productRepository->all();
         return response()->json($products);
     }
 
@@ -67,18 +71,9 @@ class ProductController extends Controller
      *     @OA\Response(response=422, description="Validação falhou")
      * )
      */
-    public function store(Request $request): JsonResponse
+    public function store(ProductRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'price' => 'required|numeric|min:0',
-            'photo' => 'nullable|string',
-            'stock' => 'required|integer|min:0',
-            'sku' => 'required|string|unique:products,sku',
-            'enable' => 'boolean'
-        ]);
-
-        $product = ProductModel::create($validated);
+        $product = $this->productRepository->create($request->validated());
         return response()->json($product, 201);
     }
 
@@ -101,8 +96,9 @@ class ProductController extends Controller
      *     @OA\Response(response=404, description="Produto não encontrado")
      * )
      */
-    public function show(ProductModel $product): JsonResponse
+    public function show(int $id): JsonResponse
     {
+        $product = $this->productRepository->find($id);
         return response()->json($product);
     }
 
@@ -137,18 +133,9 @@ class ProductController extends Controller
      *     @OA\Response(response=422, description="Validação falhou")
      * )
      */
-    public function update(Request $request, ProductModel $product): JsonResponse
+    public function update(ProductRequest $request, int $id): JsonResponse
     {
-        $validated = $request->validate([
-            'name' => 'sometimes|string|max:255',
-            'price' => 'sometimes|numeric|min:0',
-            'photo' => 'nullable|string',
-            'stock' => 'sometimes|integer|min:0',
-            'sku' => 'sometimes|string|unique:products,sku,' . $product->id,
-            'enable' => 'boolean'
-        ]);
-
-        $product->update($validated);
+        $product = $this->productRepository->update($id, $request->validated());
         return response()->json($product);
     }
 
@@ -170,9 +157,9 @@ class ProductController extends Controller
      *     @OA\Response(response=404, description="Produto não encontrado")
      * )
      */
-    public function destroy(ProductModel $product): JsonResponse
+    public function destroy(int $id): JsonResponse
     {
-        $product->delete();
+        $this->productRepository->delete($id);
         return response()->json(null, 204);
     }
 }

@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\OrderModel;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use App\Http\Requests\OrderRequest;
+use App\Repositories\Contracts\OrderRepositoryInterface;
 
 /**
  * @OA\Schema(
@@ -27,6 +27,10 @@ use Illuminate\Http\JsonResponse;
 class OrderController extends Controller
 {
 
+    public function __construct(
+        private OrderRepositoryInterface $orderRepository
+    ) {}
+
     /**
      * @OA\Get(
      *     path="/api/orders",
@@ -41,7 +45,7 @@ class OrderController extends Controller
      */
     public function index(): JsonResponse
     {
-        $orders = OrderModel::with(['client', 'product'])->get();
+        $orders = $this->orderRepository->all();
         return response()->json($orders);
     }
 
@@ -71,20 +75,10 @@ class OrderController extends Controller
      *     @OA\Response(response=422, description="Validação falhou")
      * )
      */
-    public function store(Request $request): JsonResponse
+    public function store(OrderRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'product_id' => 'required|exists:products,id',
-            'client_id' => 'required|exists:clients,id',
-            'quantity' => 'required|integer|min:1',
-            'unit_value' => 'required|numeric|min:0',
-            'total_value' => 'required|numeric|min:0',
-            'status' => 'required|string|in:pending,approved,canceled,delivered',
-            'notes' => 'nullable|string'
-        ]);
-
-        $order = OrderModel::create($validated);
-        return response()->json($order->load(['client', 'product']), 201);
+        $order = $this->orderRepository->create($request->validated());
+        return response()->json($order, 201);
     }
 
     /**
@@ -106,9 +100,10 @@ class OrderController extends Controller
      *     @OA\Response(response=404, description="Pedido não encontrado")
      * )
      */
-    public function show(OrderModel $order): JsonResponse
+    public function show(int $id): JsonResponse
     {
-        return response()->json($order->load(['client', 'product']));
+        $order = $this->orderRepository->find($id);
+        return response()->json($order);
     }
 
     /**
@@ -143,20 +138,10 @@ class OrderController extends Controller
      *     @OA\Response(response=422, description="Validação falhou")
      * )
      */
-    public function update(Request $request, OrderModel $order): JsonResponse
+    public function update(OrderRequest $request, int $id): JsonResponse
     {
-        $validated = $request->validate([
-            'product_id' => 'sometimes|exists:products,id',
-            'client_id' => 'sometimes|exists:clients,id',
-            'quantity' => 'sometimes|integer|min:1',
-            'unit_value' => 'sometimes|numeric|min:0',
-            'total_value' => 'sometimes|numeric|min:0',
-            'status' => 'sometimes|string|in:pending,approved,canceled,delivered',
-            'notes' => 'nullable|string'
-        ]);
-
-        $order->update($validated);
-        return response()->json($order->load(['client', 'product']));
+        $order = $this->orderRepository->update($id, $request->validated());
+        return response()->json($order);
     }
 
     /**
@@ -177,9 +162,9 @@ class OrderController extends Controller
      *     @OA\Response(response=404, description="Pedido não encontrado")
      * )
      */
-    public function destroy(OrderModel $order): JsonResponse
+    public function destroy(int $id): JsonResponse
     {
-        $order->delete();
+        $this->orderRepository->delete($id);
         return response()->json(null, 204);
     }
 }

@@ -7,9 +7,11 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\DatabasePresenceVerifier;
 use Mockery;
 use Tests\TestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class ClientRequestTest extends TestCase
 {
+    use RefreshDatabase;
     private function getValidator(array $data)
     {
         $request = new ClientRequest();
@@ -20,13 +22,7 @@ class ClientRequestTest extends TestCase
 
     public function test_client_store_validation()
     {
-        $verifier = Mockery::mock(DatabasePresenceVerifier::class);
-        $verifier->shouldReceive('getCount')->andReturn(0);
-        $verifier->shouldReceive('setConnection')->andReturnSelf();
-
-        Validator::setPresenceVerifier($verifier);
-
-        $validator = $this->getValidator([
+        $data = [
             'name' => 'José',
             'mail' => 'jromano@test.com',
             'phone' => '123456',
@@ -35,9 +31,39 @@ class ClientRequestTest extends TestCase
             'number' => '10',
             'zipcode' => '12345678',
             'district' => 'Centro'
-        ]);
+        ];
 
-        $this->assertTrue($validator->passes());
+        $request = new ClientRequest();
+        $request->setMethod('POST');
+
+        $rules = $request->rules();
+
+        $validator = Validator::make($data, $rules);
+
+        $this->assertFalse($validator->fails());
+    }
+
+    public function test_client_update_validation()
+    {
+        $data = [
+            'name' => 'José Guilherme',
+            'mail' => 'jromano@test.com',
+            'phone' => '123456',
+            'birthdate' => '1996-01-01',
+            'place' => 'Main St',
+            'number' => '10',
+            'zipcode' => '12345678',
+            'district' => 'Centro'
+        ];
+
+        $request = new ClientRequest();
+        $request->setMethod('PUT');
+
+        $rules = $request->rules();
+
+        $validator = Validator::make($data, $rules);
+
+        $this->assertFalse($validator->fails());
     }
 
     public function test_client_store_validation_fails_if_mail_exists()

@@ -5,10 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class OrderModel extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, HasFactory;
     protected $table = 'orders';
 
     protected $fillable = [
@@ -29,6 +30,23 @@ class OrderModel extends Model
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime'
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($order) {
+            if (empty($order->total_value) && $order->quantity && $order->unit_value) {
+                $order->total_value = $order->quantity * $order->unit_value;
+            }
+        });
+
+        static::updating(function ($order) {
+            if ($order->isDirty(['quantity', 'unit_value'])) {
+                $order->total_value = $order->quantity * $order->unit_value;
+            }
+        });
+    }
 
     public function client(): BelongsTo
     {
