@@ -1,4 +1,4 @@
-# 🥟 Pastelaria API
+# 🥟 PASTEL 360º API
 
 Uma API completa para gerenciamento de pedidos de uma pastelaria, desenvolvida em Laravel com arquitetura limpa e boas práticas.
 
