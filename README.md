@@ -38,7 +38,7 @@ Esta API permite o gerenciamento completo de uma pastelaria, incluindo cadastro 
 ### 📦 Gestão de Pedidos
 
 - Criação de pedidos com múltiplos itens
-- Fluxo de status: `pending` → `approved` → `in_preparation` → `ready` → `delivered`
+- Fluxo de status: `pending` → `approved` → `delivered` → `canceled`
 - Cálculo automático de valores
 - Soft delete para manter histórico
 
