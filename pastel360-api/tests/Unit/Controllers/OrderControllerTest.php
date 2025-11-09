@@ -15,14 +15,16 @@ class OrderControllerTest extends TestCase
     private $repositoryMock;
     private $orderMock;
     private $controller;
+    private $serviceMock;
 
     protected function setUp(): void
     {
         parent::setUp();
 
+        $this->serviceMock = \Mockery::mock(\App\Services\OrderService::class);
         $this->repositoryMock = Mockery::mock(OrderRepositoryInterface::class);
         $this->orderMock = Mockery::mock(OrderModel::class)->makePartial();
-        $this->controller = new OrderController($this->repositoryMock);
+        $this->controller = new OrderController($this->repositoryMock, $this->serviceMock);
     }
 
     protected function mockRequest(array $data)
@@ -60,12 +62,13 @@ class OrderControllerTest extends TestCase
 
         $this->orderMock->shouldReceive('toArray')->andReturn($data);
 
-        $this->repositoryMock->shouldReceive('create')
-            ->with($data)
-            ->once()
-            ->andReturn($this->orderMock);
-
         $request = $this->mockRequest($data);
+
+        $this->serviceMock->shouldReceive('createOrder')
+            ->once()
+            ->with($data)
+            ->andReturn($data);
+
         $response = $this->controller->store($request);
 
         $this->assertEquals(201, $response->getStatusCode());

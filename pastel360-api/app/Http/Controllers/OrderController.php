@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\JsonResponse;
 use App\Http\Requests\OrderRequest;
 use App\Repositories\Contracts\OrderRepositoryInterface;
+use App\Services\OrderService;
 
 /**
  * @OA\Schema(
@@ -54,7 +55,8 @@ class OrderController extends Controller
 {
 
     public function __construct(
-        private OrderRepositoryInterface $orderRepository
+        private OrderRepositoryInterface $orderRepository,
+        private OrderService $service
     ) {}
 
     /**
@@ -110,7 +112,7 @@ class OrderController extends Controller
      */
     public function store(OrderRequest $request): JsonResponse
     {
-        $order = $this->orderRepository->create($request->validated());
+        $order = $this->service->createOrder($request->validated());
         return response()->json($order, 201);
     }
 

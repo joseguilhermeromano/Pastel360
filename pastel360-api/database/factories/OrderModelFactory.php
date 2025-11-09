@@ -14,7 +14,7 @@ class OrderModelFactory extends Factory
     {
         return [
             'customer_id' => CustomerModel::factory(),
-            'status' => $this->faker->randomElement(['pending', 'approved', 'in_preparation', 'ready', 'delivered', 'canceled']),
+            'status' => $this->faker->randomElement(['pending', 'approved', 'delivered', 'canceled']),
             'total_amount' => 0,
             'notes' => $this->faker->optional(0.3)->sentence(6),
         ];
