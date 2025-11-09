@@ -15,7 +15,7 @@ class OrderRequest extends FormRequest
     {
         $rules = [
             'product_id' => 'sometimes|integer|exists:products,id',
-            'client_id' => 'sometimes|integer|exists:clients,id',
+            'customer_id' => 'sometimes|integer|exists:customers,id',
             'quantity' => 'sometimes|integer|min:1',
             'unit_value' => 'sometimes|numeric|min:0',
             'status' => 'sometimes|string|in:pending,approved,canceled,delivered',
@@ -24,7 +24,7 @@ class OrderRequest extends FormRequest
 
         if ($this->isMethod('post')) {
             $rules['product_id'] = 'required|integer|exists:products,id';
-            $rules['client_id'] = 'required|integer|exists:clients,id';
+            $rules['customer_id'] = 'required|integer|exists:customers,id';
             $rules['quantity'] = 'required|integer|min:1';
             $rules['unit_value'] = 'required|numeric|min:0';
             $rules['status'] = 'required|string|in:pending,approved,delivered,canceled';

@@ -17,8 +17,8 @@ return new class extends Migration
                 ->constrained('products')
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
-            $table->foreignId('client_id')
-                ->constrained('clients')
+            $table->foreignId('customer_id')
+                ->constrained('customers')
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
             $table->integer('quantity')->default(1);

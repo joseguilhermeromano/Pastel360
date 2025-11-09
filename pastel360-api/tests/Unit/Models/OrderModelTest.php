@@ -5,7 +5,7 @@ namespace Tests\Unit\Models;
 use Tests\TestCase;
 use App\Models\OrderModel;
 use App\Models\ProductModel;
-use App\Models\ClientModel;
+use App\Models\CustomerModel;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class OrderModelTest extends TestCase
@@ -15,11 +15,11 @@ class OrderModelTest extends TestCase
     public function test_order_creation()
     {
         $product = ProductModel::factory()->create();
-        $client = ClientModel::factory()->create();
+        $customer = CustomerModel::factory()->create();
 
         $order = OrderModel::create([
             'product_id' => $product->id,
-            'client_id' => $client->id,
+            'customer_id' => $customer->id,
             'quantity' => 2,
             'unit_value' => 10.50,
             'total_value' => 21.00,
@@ -33,11 +33,11 @@ class OrderModelTest extends TestCase
     public function test_total_value_calculated_automatically_on_create()
     {
         $product = ProductModel::factory()->create();
-        $client = ClientModel::factory()->create();
+        $customer = CustomerModel::factory()->create();
 
         $order = OrderModel::create([
             'product_id' => $product->id,
-            'client_id' => $client->id,
+            'customer_id' => $customer->id,
             'quantity' => 3,
             'unit_value' => 15.50,
             'status' => 'pending'
@@ -50,11 +50,11 @@ class OrderModelTest extends TestCase
     public function test_total_value_not_calculated_when_provided()
     {
         $product = ProductModel::factory()->create();
-        $client = ClientModel::factory()->create();
+        $customer = CustomerModel::factory()->create();
 
         $order = OrderModel::create([
             'product_id' => $product->id,
-            'client_id' => $client->id,
+            'customer_id' => $customer->id,
             'quantity' => 2,
             'unit_value' => 10.00,
             'total_value' => 25.00,
@@ -67,11 +67,11 @@ class OrderModelTest extends TestCase
     public function test_total_value_recalculated_on_quantity_update()
     {
         $product = ProductModel::factory()->create();
-        $client = ClientModel::factory()->create();
+        $customer = CustomerModel::factory()->create();
 
         $order = OrderModel::create([
             'product_id' => $product->id,
-            'client_id' => $client->id,
+            'customer_id' => $customer->id,
             'quantity' => 2,
             'unit_value' => 10.00,
             'status' => 'pending'
@@ -86,11 +86,11 @@ class OrderModelTest extends TestCase
     public function test_total_value_recalculated_on_unit_value_update()
     {
         $product = ProductModel::factory()->create();
-        $client = ClientModel::factory()->create();
+        $customer = CustomerModel::factory()->create();
 
         $order = OrderModel::create([
             'product_id' => $product->id,
-            'client_id' => $client->id,
+            'customer_id' => $customer->id,
             'quantity' => 2,
             'unit_value' => 10.00,
             'status' => 'pending'
@@ -105,11 +105,11 @@ class OrderModelTest extends TestCase
     public function test_total_value_not_recalculated_on_other_field_update()
     {
         $product = ProductModel::factory()->create();
-        $client = ClientModel::factory()->create();
+        $customer = CustomerModel::factory()->create();
 
         $order = OrderModel::create([
             'product_id' => $product->id,
-            'client_id' => $client->id,
+            'customer_id' => $customer->id,
             'quantity' => 2,
             'unit_value' => 10.00,
             'status' => 'pending'
@@ -121,13 +121,13 @@ class OrderModelTest extends TestCase
         $this->assertEquals($originalTotal, $order->total_value);
     }
 
-    public function test_order_belongs_to_client()
+    public function test_order_belongs_to_customer()
     {
-        $order = OrderModel::make(['client_id' => 1]);
-        $relation = $order->client();
+        $order = OrderModel::make(['customer_id' => 1]);
+        $relation = $order->customer();
 
         $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\BelongsTo::class, $relation);
-        $this->assertEquals('client_id', $relation->getForeignKeyName());
+        $this->assertEquals('customer_id', $relation->getForeignKeyName());
     }
 
     public function test_order_belongs_to_product()

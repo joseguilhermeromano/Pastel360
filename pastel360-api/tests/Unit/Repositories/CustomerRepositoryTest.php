@@ -3,25 +3,25 @@
 namespace Tests\Unit\Repositories;
 
 use Tests\TestCase;
-use App\Models\ClientModel;
-use App\Repositories\ClientRepository;
+use App\Models\CustomerModel;
+use App\Repositories\CustomerRepository;
 use Illuminate\Database\Eloquent\Collection;
 use Mockery;
 
-class ClientRepositoryTest extends TestCase
+class CustomerRepositoryTest extends TestCase
 {
     private $modelMock;
-    private ClientRepository $repository;
+    private CustomerRepository $repository;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->modelMock = Mockery::mock(ClientModel::class);
-        $this->repository = new ClientRepository($this->modelMock);
+        $this->modelMock = Mockery::mock(CustomerModel::class);
+        $this->repository = new CustomerRepository($this->modelMock);
     }
 
-    public function test_all_returns_all_clients()
+    public function test_all_returns_all_customers()
     {
         $collection = new Collection([new \stdClass, new \stdClass]);
 
@@ -34,7 +34,7 @@ class ClientRepositoryTest extends TestCase
         $this->assertCount(2, $result);
     }
 
-    public function test_find_returns_client()
+    public function test_find_returns_customer()
     {
         $this->modelMock->shouldReceive('findOrFail')
             ->with(1)
@@ -43,10 +43,10 @@ class ClientRepositoryTest extends TestCase
 
         $result = $this->repository->find(1);
 
-        $this->assertInstanceOf(ClientModel::class, $result);
+        $this->assertInstanceOf(CustomerModel::class, $result);
     }
 
-    public function test_create_stores_client_with_all_fields()
+    public function test_create_stores_customer_with_all_fields()
     {
         $data = [
             'name' => 'José Romano',
@@ -67,10 +67,10 @@ class ClientRepositoryTest extends TestCase
 
         $result = $this->repository->create($data);
 
-        $this->assertInstanceOf(ClientModel::class, $result);
+        $this->assertInstanceOf(CustomerModel::class, $result);
     }
 
-    public function test_update_modifies_client()
+    public function test_update_modifies_customer()
     {
         $data = ['name' => 'Guilherme'];
 
@@ -86,10 +86,10 @@ class ClientRepositoryTest extends TestCase
 
         $result = $this->repository->update(1, $data);
 
-        $this->assertInstanceOf(ClientModel::class, $result);
+        $this->assertInstanceOf(CustomerModel::class, $result);
     }
 
-    public function test_delete_removes_client()
+    public function test_delete_removes_customer()
     {
         $this->modelMock->shouldReceive('findOrFail')
             ->with(1)

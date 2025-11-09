@@ -14,7 +14,7 @@ class OrderModel extends Model
 
     protected $fillable = [
         'product_id',
-        'client_id',
+        'customer_id',
         'quantity',
         'unit_value',
         'total_value',
@@ -48,9 +48,9 @@ class OrderModel extends Model
         });
     }
 
-    public function client(): BelongsTo
+    public function customer(): BelongsTo
     {
-        return $this->belongsTo(ClientModel::class, 'client_id');
+        return $this->belongsTo(CustomerModel::class, 'customer_id');
     }
 
     public function product(): BelongsTo

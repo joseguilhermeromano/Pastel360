@@ -12,22 +12,22 @@
         }
     ],
     "paths": {
-        "/api/clients": {
+        "/api/customers": {
             "get": {
                 "tags": [
-                    "Clients"
+                    "Customers"
                 ],
-                "summary": "Lista todos os clientes",
-                "operationId": "d00d20521584ab5da83e088abb7aded2",
+                "summary": "Lista todos os customeres",
+                "operationId": "2b23ac696cfd81c23807c2c1fd63b0b0",
                 "responses": {
                     "200": {
-                        "description": "Lista de clientes",
+                        "description": "Lista de customeres",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "type": "array",
                                     "items": {
-                                        "$ref": "#/components/schemas/Client"
+                                        "$ref": "#/components/schemas/Customer"
                                     }
                                 }
                             }
@@ -37,10 +37,10 @@
             },
             "post": {
                 "tags": [
-                    "Clients"
+                    "Customers"
                 ],
-                "summary": "Cria um novo cliente",
-                "operationId": "f1e86e5b79fedfa6593067977292b13b",
+                "summary": "Cria um novo customere",
+                "operationId": "428d5533c8386f91d2baf4de69f01468",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -103,11 +103,11 @@
                 },
                 "responses": {
                     "201": {
-                        "description": "Cliente criado com sucesso",
+                        "description": "Customere criado com sucesso",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Client"
+                                    "$ref": "#/components/schemas/Customer"
                                 }
                             }
                         }
@@ -118,13 +118,13 @@
                 }
             }
         },
-        "/api/clients/{id}": {
+        "/api/customers/{id}": {
             "get": {
                 "tags": [
-                    "Clients"
+                    "Customers"
                 ],
-                "summary": "Obtém um cliente específico",
-                "operationId": "4c3c7071ea1133f04bacdbc70f8aa230",
+                "summary": "Obtém um customere específico",
+                "operationId": "d51ce35bfe185b82c242dd4443ffba54",
                 "parameters": [
                     {
                         "name": "id",
@@ -137,26 +137,26 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Cliente encontrado",
+                        "description": "Customere encontrado",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Client"
+                                    "$ref": "#/components/schemas/Customer"
                                 }
                             }
                         }
                     },
                     "404": {
-                        "description": "Cliente não encontrado"
+                        "description": "Customere não encontrado"
                     }
                 }
             },
             "put": {
                 "tags": [
-                    "Clients"
+                    "Customers"
                 ],
-                "summary": "Atualiza um cliente",
-                "operationId": "7d0a5ae9e306858d30e04fc50265d80c",
+                "summary": "Atualiza um customere",
+                "operationId": "07a3f33c1373d3c6a97b7d8846d81472",
                 "parameters": [
                     {
                         "name": "id",
@@ -219,17 +219,17 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Cliente atualizado",
+                        "description": "Customere atualizado",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/Client"
+                                    "$ref": "#/components/schemas/Customer"
                                 }
                             }
                         }
                     },
                     "404": {
-                        "description": "Cliente não encontrado"
+                        "description": "Customere não encontrado"
                     },
                     "422": {
                         "description": "Validação falhou"
@@ -238,10 +238,10 @@
             },
             "delete": {
                 "tags": [
-                    "Clients"
+                    "Customers"
                 ],
-                "summary": "Exclui um cliente",
-                "operationId": "c929f14f421a80a896c6fe116ffdc317",
+                "summary": "Exclui um customere",
+                "operationId": "634844e24d72540f608f7fd297f5d8b0",
                 "parameters": [
                     {
                         "name": "id",
@@ -254,10 +254,10 @@
                 ],
                 "responses": {
                     "204": {
-                        "description": "Cliente excluído com sucesso"
+                        "description": "Customere excluído com sucesso"
                     },
                     "404": {
-                        "description": "Cliente não encontrado"
+                        "description": "Customere não encontrado"
                     }
                 }
             }
@@ -298,7 +298,7 @@
                             "schema": {
                                 "required": [
                                     "product_id",
-                                    "client_id",
+                                    "customer_id",
                                     "quantity",
                                     "unit_value",
                                     "total_value",
@@ -309,7 +309,7 @@
                                         "type": "integer",
                                         "example": 1
                                     },
-                                    "client_id": {
+                                    "customer_id": {
                                         "type": "integer",
                                         "example": 1
                                     },
@@ -423,7 +423,7 @@
                                         "type": "integer",
                                         "example": 1
                                     },
-                                    "client_id": {
+                                    "customer_id": {
                                         "type": "integer",
                                         "example": 1
                                     },
@@ -729,7 +729,7 @@
     },
     "components": {
         "schemas": {
-            "Client": {
+            "Customer": {
                 "properties": {
                     "id": {
                         "type": "integer",
@@ -794,7 +794,7 @@
                         "type": "integer",
                         "example": 1
                     },
-                    "client_id": {
+                    "customer_id": {
                         "type": "integer",
                         "example": 1
                     },
@@ -820,8 +820,8 @@
                         "type": "string",
                         "example": "Entregar de manhã"
                     },
-                    "client": {
-                        "$ref": "#/components/schemas/Client"
+                    "customer": {
+                        "$ref": "#/components/schemas/Customer"
                     },
                     "product": {
                         "$ref": "#/components/schemas/Product"
@@ -883,8 +883,8 @@
     },
     "tags": [
         {
-            "name": "Clients",
-            "description": "Clients"
+            "name": "Customers",
+            "description": "Customers"
         },
         {
             "name": "Orders",

@@ -12,13 +12,13 @@ use App\Repositories\Contracts\OrderRepositoryInterface;
  *     type="object",
  *     @OA\Property(property="id", type="integer", example=1),
  *     @OA\Property(property="product_id", type="integer", example=1),
- *     @OA\Property(property="client_id", type="integer", example=1),
+ *     @OA\Property(property="customer_id", type="integer", example=1),
  *     @OA\Property(property="quantity", type="integer", example=2),
  *     @OA\Property(property="unit_value", type="number", format="float", example=1500.00),
  *     @OA\Property(property="total_value", type="number", format="float", example=3000.00),
  *     @OA\Property(property="status", type="string", example="pending"),
  *     @OA\Property(property="notes", type="string", example="Entregar de manhã"),
- *     @OA\Property(property="client", ref="#/components/schemas/Client"),
+ *     @OA\Property(property="customer", ref="#/components/schemas/Customer"),
  *     @OA\Property(property="product", ref="#/components/schemas/Product"),
  *     @OA\Property(property="created_at", type="string", format="date-time"),
  *     @OA\Property(property="updated_at", type="string", format="date-time")
@@ -57,9 +57,9 @@ class OrderController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             required={"product_id","client_id","quantity","unit_value","total_value","status"},
+     *             required={"product_id","customer_id","quantity","unit_value","total_value","status"},
      *             @OA\Property(property="product_id", type="integer", example=1),
-     *             @OA\Property(property="client_id", type="integer", example=1),
+     *             @OA\Property(property="customer_id", type="integer", example=1),
      *             @OA\Property(property="quantity", type="integer", example=2),
      *             @OA\Property(property="unit_value", type="number", format="float", example=1500.00),
      *             @OA\Property(property="total_value", type="number", format="float", example=3000.00),
@@ -121,7 +121,7 @@ class OrderController extends Controller
      *         required=true,
      *         @OA\JsonContent(
      *             @OA\Property(property="product_id", type="integer", example=1),
-     *             @OA\Property(property="client_id", type="integer", example=1),
+     *             @OA\Property(property="customer_id", type="integer", example=1),
      *             @OA\Property(property="quantity", type="integer", example=2),
      *             @OA\Property(property="unit_value", type="number", format="float", example=1500.00),
      *             @OA\Property(property="total_value", type="number", format="float", example=3000.00),

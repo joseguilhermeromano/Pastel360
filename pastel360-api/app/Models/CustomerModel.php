@@ -6,11 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class ClientModel extends Model
+class CustomerModel extends Model
 {
     use SoftDeletes, HasFactory;
 
-    protected $table = 'clients';
+    protected $table = 'customers';
 
     protected $fillable = [
         'name',

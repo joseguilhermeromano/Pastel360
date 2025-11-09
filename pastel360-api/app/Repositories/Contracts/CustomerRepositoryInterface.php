@@ -2,7 +2,7 @@
 
 namespace App\Repositories\Contracts;
 
-interface ClientRepositoryInterface
+interface CustomerRepositoryInterface
 {
     public function all();
     public function find(int $id);

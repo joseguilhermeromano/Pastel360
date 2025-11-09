@@ -3,12 +3,12 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
-use App\Http\Requests\ClientRequest;
-use App\Repositories\Contracts\ClientRepositoryInterface;
+use App\Http\Requests\CustomerRequest;
+use App\Repositories\Contracts\CustomerRepositoryInterface;
 
 /**
  * @OA\Schema(
- *     schema="Client",
+ *     schema="Customer",
  *     type="object",
  *     @OA\Property(property="id", type="integer", example=1),
  *     @OA\Property(property="name", type="string", example="José Romano"),
@@ -24,36 +24,36 @@ use App\Repositories\Contracts\ClientRepositoryInterface;
  *     @OA\Property(property="updated_at", type="string", format="date-time")
  * )
  */
-class ClientController extends Controller
+class CustomerController extends Controller
 {
 
     public function __construct(
-        private ClientRepositoryInterface $clientRepository
+        private CustomerRepositoryInterface $customerRepository
     ) {}
 
     /**
      * @OA\Get(
-     *     path="/api/clients",
-     *     summary="Lista todos os clientes",
-     *     tags={"Clients"},
+     *     path="/api/customers",
+     *     summary="Lista todos os customeres",
+     *     tags={"Customers"},
      *     @OA\Response(
      *         response=200,
-     *         description="Lista de clientes",
-     *         @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/Client"))
+     *         description="Lista de customeres",
+     *         @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/Customer"))
      *     )
      * )
      */
     public function index(): JsonResponse
     {
-        $clients = $this->clientRepository->all();
-        return response()->json($clients);
+        $customers = $this->customerRepository->all();
+        return response()->json($customers);
     }
 
     /**
      * @OA\Post(
-     *     path="/api/clients",
-     *     summary="Cria um novo cliente",
-     *     tags={"Clients"},
+     *     path="/api/customers",
+     *     summary="Cria um novo customere",
+     *     tags={"Customers"},
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
@@ -71,23 +71,23 @@ class ClientController extends Controller
      *     ),
      *     @OA\Response(
      *         response=201,
-     *         description="Cliente criado com sucesso",
-     *         @OA\JsonContent(ref="#/components/schemas/Client")
+     *         description="Customere criado com sucesso",
+     *         @OA\JsonContent(ref="#/components/schemas/Customer")
      *     ),
      *     @OA\Response(response=422, description="Validação falhou")
      * )
      */
-    public function store(ClientRequest $request): JsonResponse
+    public function store(CustomerRequest $request): JsonResponse
     {
-        $client = $this->clientRepository->create($request->validated());
-        return response()->json($client, 201);
+        $customer = $this->customerRepository->create($request->validated());
+        return response()->json($customer, 201);
     }
 
     /**
      * @OA\Get(
-     *     path="/api/clients/{id}",
-     *     summary="Obtém um cliente específico",
-     *     tags={"Clients"},
+     *     path="/api/customers/{id}",
+     *     summary="Obtém um customere específico",
+     *     tags={"Customers"},
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
@@ -96,23 +96,23 @@ class ClientController extends Controller
      *     ),
      *     @OA\Response(
      *         response=200,
-     *         description="Cliente encontrado",
-     *         @OA\JsonContent(ref="#/components/schemas/Client")
+     *         description="Customere encontrado",
+     *         @OA\JsonContent(ref="#/components/schemas/Customer")
      *     ),
-     *     @OA\Response(response=404, description="Cliente não encontrado")
+     *     @OA\Response(response=404, description="Customere não encontrado")
      * )
      */
     public function show(int $id): JsonResponse
     {
-        $client = $this->clientRepository->find($id);
-        return response()->json($client);
+        $customer = $this->customerRepository->find($id);
+        return response()->json($customer);
     }
 
     /**
      * @OA\Put(
-     *     path="/api/clients/{id}",
-     *     summary="Atualiza um cliente",
-     *     tags={"Clients"},
+     *     path="/api/customers/{id}",
+     *     summary="Atualiza um customere",
+     *     tags={"Customers"},
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
@@ -135,24 +135,24 @@ class ClientController extends Controller
      *     ),
      *     @OA\Response(
      *         response=200,
-     *         description="Cliente atualizado",
-     *         @OA\JsonContent(ref="#/components/schemas/Client")
+     *         description="Customere atualizado",
+     *         @OA\JsonContent(ref="#/components/schemas/Customer")
      *     ),
-     *     @OA\Response(response=404, description="Cliente não encontrado"),
+     *     @OA\Response(response=404, description="Customere não encontrado"),
      *     @OA\Response(response=422, description="Validação falhou")
      * )
      */
-    public function update(ClientRequest $request, int $id): JsonResponse
+    public function update(CustomerRequest $request, int $id): JsonResponse
     {
-        $client = $this->clientRepository->update($id, $request->validated());
-        return response()->json($client);
+        $customer = $this->customerRepository->update($id, $request->validated());
+        return response()->json($customer);
     }
 
     /**
      * @OA\Delete(
-     *     path="/api/clients/{id}",
-     *     summary="Exclui um cliente",
-     *     tags={"Clients"},
+     *     path="/api/customers/{id}",
+     *     summary="Exclui um customere",
+     *     tags={"Customers"},
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
@@ -161,14 +161,14 @@ class ClientController extends Controller
      *     ),
      *     @OA\Response(
      *         response=204,
-     *         description="Cliente excluído com sucesso"
+     *         description="Customere excluído com sucesso"
      *     ),
-     *     @OA\Response(response=404, description="Cliente não encontrado")
+     *     @OA\Response(response=404, description="Customere não encontrado")
      * )
      */
     public function destroy(int $id): JsonResponse
     {
-        $this->clientRepository->delete($id);
+        $this->customerRepository->delete($id);
         return response()->json(null, 204);
     }
 }

@@ -2,25 +2,25 @@
 
 namespace Tests\Unit\Requests;
 
-use App\Http\Requests\ClientRequest;
+use App\Http\Requests\CustomerRequest;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\DatabasePresenceVerifier;
 use Mockery;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
-class ClientRequestTest extends TestCase
+class CustomerRequestTest extends TestCase
 {
     use RefreshDatabase;
     private function getValidator(array $data)
     {
-        $request = new ClientRequest();
+        $request = new CustomerRequest();
         $request->merge($data);
 
         return Validator::make($data, $request->rules());
     }
 
-    public function test_client_store_validation()
+    public function test_customer_store_validation()
     {
         $data = [
             'name' => 'José',
@@ -33,7 +33,7 @@ class ClientRequestTest extends TestCase
             'district' => 'Centro'
         ];
 
-        $request = new ClientRequest();
+        $request = new CustomerRequest();
         $request->setMethod('POST');
 
         $rules = $request->rules();
@@ -43,7 +43,7 @@ class ClientRequestTest extends TestCase
         $this->assertFalse($validator->fails());
     }
 
-    public function test_client_update_validation()
+    public function test_customer_update_validation()
     {
         $data = [
             'name' => 'José Guilherme',
@@ -56,7 +56,7 @@ class ClientRequestTest extends TestCase
             'district' => 'Centro'
         ];
 
-        $request = new ClientRequest();
+        $request = new CustomerRequest();
         $request->setMethod('PUT');
 
         $rules = $request->rules();
@@ -66,7 +66,7 @@ class ClientRequestTest extends TestCase
         $this->assertFalse($validator->fails());
     }
 
-    public function test_client_store_validation_fails_if_mail_exists()
+    public function test_customer_store_validation_fails_if_mail_exists()
     {
         $verifier = Mockery::mock(DatabasePresenceVerifier::class);
         $verifier->shouldReceive('getCount')->andReturn(1);
@@ -89,9 +89,9 @@ class ClientRequestTest extends TestCase
         $this->assertArrayHasKey('mail', $validator->errors()->toArray());
     }
 
-    public function test_client_request_authorize_allows_access()
+    public function test_customer_request_authorize_allows_access()
     {
-        $request = new ClientRequest();
+        $request = new CustomerRequest();
 
         $this->assertTrue($request->authorize());
     }

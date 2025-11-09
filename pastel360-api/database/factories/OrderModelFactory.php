@@ -4,7 +4,7 @@ namespace Database\Factories;
 
 use App\Models\OrderModel;
 use App\Models\ProductModel;
-use App\Models\ClientModel;
+use App\Models\CustomerModel;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class OrderModelFactory extends Factory
@@ -15,7 +15,7 @@ class OrderModelFactory extends Factory
     {
         return [
             'product_id' => ProductModel::factory(),
-            'client_id' => ClientModel::factory(),
+            'customer_id' => CustomerModel::factory(),
             'quantity' => $this->faker->numberBetween(1, 10),
             'unit_value' => $this->faker->randomFloat(2, 10, 100),
             'total_value' => function (array $attributes) {

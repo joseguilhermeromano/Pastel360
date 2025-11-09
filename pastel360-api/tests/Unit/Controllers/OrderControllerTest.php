@@ -51,7 +51,7 @@ class OrderControllerTest extends TestCase
     {
         $data = [
             'product_id' => 1,
-            'client_id' => 1,
+            'customer_id' => 1,
             'quantity' => 2,
             'unit_value' => 10.00,
             'status' => 'pending',
@@ -77,7 +77,7 @@ class OrderControllerTest extends TestCase
         $attrs = [
             'id' => 1,
             'product_id' => 1,
-            'client_id' => 1,
+            'customer_id' => 1,
             'quantity' => 2,
             'unit_value' => 10.00,
             'total_value' => 20.00,

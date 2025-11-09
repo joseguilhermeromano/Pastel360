@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use App\Http\Requests\Concerns\ValidationRules;
 use Illuminate\Foundation\Http\FormRequest;
 
-class ClientRequest extends FormRequest
+class CustomerRequest extends FormRequest
 {
     use ValidationRules;
 
@@ -16,11 +16,11 @@ class ClientRequest extends FormRequest
 
     public function rules()
     {
-        $clientId = $this->route('client');
+        $customerId = $this->route('customer');
 
         $rules = [
             'name' => $this->stringMax255(),
-            'mail' => 'sometimes|email|unique:clients,mail,' . $clientId,
+            'mail' => 'sometimes|email|unique:customers,mail,' . $customerId,
             'phone' => 'sometimes|string|max:20',
             'birthdate' => 'sometimes|date',
             'place' => $this->stringMax255(),
@@ -32,7 +32,7 @@ class ClientRequest extends FormRequest
 
         if ($this->isMethod('post')) {
             $rules['name'] = $this->requiredStringMax255();
-            $rules['mail'] = 'required|email|unique:clients,mail';
+            $rules['mail'] = 'required|email|unique:customers,mail';
             $rules['phone'] = 'required|string|max:20';
             $rules['birthdate'] = 'required|date';
             $rules['place'] = $this->requiredStringMax255();

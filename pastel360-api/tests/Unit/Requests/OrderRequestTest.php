@@ -12,7 +12,7 @@ class OrderRequestTest extends TestCase
     {
         $data = [
             'product_id' => 1,
-            'client_id' => 1,
+            'customer_id' => 1,
             'quantity' => 2,
             'unit_value' => 10.00,
             'status' => 'pending',
@@ -25,7 +25,7 @@ class OrderRequestTest extends TestCase
         $rules = $request->rules();
 
         $rules['product_id'] = 'required|integer';
-        $rules['client_id'] = 'required|integer';
+        $rules['customer_id'] = 'required|integer';
 
         $validator = Validator::make($data, $rules);
 
@@ -36,7 +36,7 @@ class OrderRequestTest extends TestCase
     {
         $invalidData = [
             'product_id' => 'invalid',
-            'client_id' => 'invalid',
+            'customer_id' => 'invalid',
             'quantity' => 0,
             'unit_value' => -10,
             'status' => 'invalid_status',
@@ -48,13 +48,13 @@ class OrderRequestTest extends TestCase
 
         $rules = $request->rules();
         $rules['product_id'] = 'required|integer';
-        $rules['client_id'] = 'required|integer';
+        $rules['customer_id'] = 'required|integer';
 
         $validator = Validator::make($invalidData, $rules);
 
         $this->assertTrue($validator->fails());
         $this->assertArrayHasKey('product_id', $validator->errors()->toArray());
-        $this->assertArrayHasKey('client_id', $validator->errors()->toArray());
+        $this->assertArrayHasKey('customer_id', $validator->errors()->toArray());
         $this->assertArrayHasKey('quantity', $validator->errors()->toArray());
         $this->assertArrayHasKey('unit_value', $validator->errors()->toArray());
         $this->assertArrayHasKey('status', $validator->errors()->toArray());
@@ -75,8 +75,8 @@ class OrderRequestTest extends TestCase
         if (isset($rules['product_id'])) {
             $rules['product_id'] = 'sometimes|integer';
         }
-        if (isset($rules['client_id'])) {
-            $rules['client_id'] = 'sometimes|integer';
+        if (isset($rules['customer_id'])) {
+            $rules['customer_id'] = 'sometimes|integer';
         }
 
         $validator = Validator::make($data, $rules);
@@ -88,7 +88,7 @@ class OrderRequestTest extends TestCase
     {
         $invalidData = [
             'product_id' => 1,
-            'client_id' => 1,
+            'customer_id' => 1,
             'quantity' => 2,
             'unit_value' => 10.00,
             'status' => 'invalid_status',
@@ -100,7 +100,7 @@ class OrderRequestTest extends TestCase
 
         $rules = $request->rules();
         $rules['product_id'] = 'required|integer';
-        $rules['client_id'] = 'required|integer';
+        $rules['customer_id'] = 'required|integer';
 
         $validator = Validator::make($invalidData, $rules);
 
