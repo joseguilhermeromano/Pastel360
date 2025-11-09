@@ -4,6 +4,7 @@ namespace Tests\Unit\Models;
 
 use Tests\TestCase;
 use App\Models\OrderModel;
+use App\Models\OrderItemModel;
 use App\Models\ProductModel;
 use App\Models\CustomerModel;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -14,111 +15,72 @@ class OrderModelTest extends TestCase
 
     public function test_order_creation()
     {
-        $product = ProductModel::factory()->create();
         $customer = CustomerModel::factory()->create();
 
         $order = OrderModel::create([
-            'product_id' => $product->id,
             'customer_id' => $customer->id,
-            'quantity' => 2,
-            'unit_value' => 10.50,
-            'total_value' => 21.00,
-            'status' => 'pending'
+            'status' => 'pending',
+            'total_amount' => 0
         ]);
 
         $this->assertInstanceOf(OrderModel::class, $order);
-        $this->assertEquals(21.00, $order->total_value);
+        $this->assertEquals('pending', $order->status);
+        $this->assertEquals(0, $order->total_amount);
     }
 
-    public function test_total_value_calculated_automatically_on_create()
+    public function test_order_with_items_creation()
     {
-        $product = ProductModel::factory()->create();
         $customer = CustomerModel::factory()->create();
+        $product1 = ProductModel::factory()->create(['price' => 8.50]);
+        $product2 = ProductModel::factory()->create(['price' => 7.50]);
 
         $order = OrderModel::create([
-            'product_id' => $product->id,
             'customer_id' => $customer->id,
+            'status' => 'pending'
+        ]);
+
+        $item1 = OrderItemModel::create([
+            'order_id' => $order->id,
+            'product_id' => $product1->id,
+            'quantity' => 2,
+            'unit_value' => 8.50
+        ]);
+
+        $item2 = OrderItemModel::create([
+            'order_id' => $order->id,
+            'product_id' => $product2->id,
+            'quantity' => 1,
+            'unit_value' => 7.50
+        ]);
+
+        $order->refreshTotalPrice();
+
+        $expectedTotal = (2 * 8.50) + (1 * 7.50);
+        $this->assertEquals($expectedTotal, $order->total_amount);
+        $this->assertCount(2, $order->items);
+    }
+
+    public function test_total_amount_calculated_from_items()
+    {
+        $customer = CustomerModel::factory()->create();
+        $product = ProductModel::factory()->create(['price' => 10.00]);
+
+        $order = OrderModel::create([
+            'customer_id' => $customer->id,
+            'status' => 'pending'
+        ]);
+
+        OrderItemModel::create([
+            'order_id' => $order->id,
+            'product_id' => $product->id,
             'quantity' => 3,
-            'unit_value' => 15.50,
-            'status' => 'pending'
+            'unit_value' => 10.00
         ]);
 
-        $expectedTotal = 3 * 15.50;
-        $this->assertEquals($expectedTotal, $order->total_value);
-    }
+        $order->refreshTotalPrice();
 
-    public function test_total_value_not_calculated_when_provided()
-    {
-        $product = ProductModel::factory()->create();
-        $customer = CustomerModel::factory()->create();
-
-        $order = OrderModel::create([
-            'product_id' => $product->id,
-            'customer_id' => $customer->id,
-            'quantity' => 2,
-            'unit_value' => 10.00,
-            'total_value' => 25.00,
-            'status' => 'pending'
-        ]);
-
-        $this->assertEquals(25.00, $order->total_value);
-    }
-
-    public function test_total_value_recalculated_on_quantity_update()
-    {
-        $product = ProductModel::factory()->create();
-        $customer = CustomerModel::factory()->create();
-
-        $order = OrderModel::create([
-            'product_id' => $product->id,
-            'customer_id' => $customer->id,
-            'quantity' => 2,
-            'unit_value' => 10.00,
-            'status' => 'pending'
-        ]);
-
-        $order->update(['quantity' => 5]);
-
-        $expectedTotal = 5 * 10.00;
-        $this->assertEquals($expectedTotal, $order->total_value);
-    }
-
-    public function test_total_value_recalculated_on_unit_value_update()
-    {
-        $product = ProductModel::factory()->create();
-        $customer = CustomerModel::factory()->create();
-
-        $order = OrderModel::create([
-            'product_id' => $product->id,
-            'customer_id' => $customer->id,
-            'quantity' => 2,
-            'unit_value' => 10.00,
-            'status' => 'pending'
-        ]);
-
-        $order->update(['unit_value' => 15.00]);
-
-        $expectedTotal = 2 * 15.00;
-        $this->assertEquals($expectedTotal, $order->total_value);
-    }
-
-    public function test_total_value_not_recalculated_on_other_field_update()
-    {
-        $product = ProductModel::factory()->create();
-        $customer = CustomerModel::factory()->create();
-
-        $order = OrderModel::create([
-            'product_id' => $product->id,
-            'customer_id' => $customer->id,
-            'quantity' => 2,
-            'unit_value' => 10.00,
-            'status' => 'pending'
-        ]);
-
-        $originalTotal = $order->total_value;
-        $order->update(['status' => 'approved']);
-
-        $this->assertEquals($originalTotal, $order->total_value);
+        $expectedTotal = 3 * 10.00;
+        $this->assertEquals($expectedTotal, $order->total_amount);
     }
 
     public function test_order_belongs_to_customer()
@@ -130,12 +92,188 @@ class OrderModelTest extends TestCase
         $this->assertEquals('customer_id', $relation->getForeignKeyName());
     }
 
-    public function test_order_belongs_to_product()
+    public function test_order_has_many_items()
     {
-        $order = OrderModel::make(['product_id' => 1]);
-        $relation = $order->product();
+        $order = OrderModel::make();
+        $relation = $order->items();
+
+        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\HasMany::class, $relation);
+        $this->assertEquals('order_id', $relation->getForeignKeyName());
+    }
+
+    public function test_refresh_total_price_method()
+    {
+        $customer = CustomerModel::factory()->create();
+        $product1 = ProductModel::factory()->create(['price' => 8.50]);
+        $product2 = ProductModel::factory()->create(['price' => 9.00]);
+
+        $order = OrderModel::create([
+            'customer_id' => $customer->id,
+            'status' => 'pending',
+            'total_amount' => 0
+        ]);
+
+        OrderItemModel::create([
+            'order_id' => $order->id,
+            'product_id' => $product1->id,
+            'quantity' => 2,
+            'unit_value' => 8.50
+        ]);
+
+        OrderItemModel::create([
+            'order_id' => $order->id,
+            'product_id' => $product2->id,
+            'quantity' => 1,
+            'unit_value' => 9.00
+        ]);
+
+        $order->refreshTotalPrice();
+        $order->refresh();
+
+        $expectedTotal = (2 * 8.50) + (1 * 9.00);
+        $this->assertEquals($expectedTotal, $order->total_amount);
+    }
+
+    public function test_order_soft_deletes()
+    {
+        $customer = CustomerModel::factory()->create();
+        $order = OrderModel::create([
+            'customer_id' => $customer->id,
+            'status' => 'pending'
+        ]);
+
+        $order->delete();
+
+        $this->assertSoftDeleted($order);
+    }
+
+    public function test_order_with_items_cascade_deletion()
+    {
+        $customer = CustomerModel::factory()->create();
+        $product = ProductModel::factory()->create();
+
+        $order = OrderModel::create([
+            'customer_id' => $customer->id,
+            'status' => 'pending'
+        ]);
+
+        $item = OrderItemModel::create([
+            'order_id' => $order->id,
+            'product_id' => $product->id,
+            'quantity' => 2,
+            'unit_value' => 8.50
+        ]);
+
+
+        $order->delete();
+
+        $this->assertSoftDeleted($order);
+
+        $this->assertDatabaseHas('order_items', [
+            'id' => $item->id,
+            'order_id' => $order->id,
+            'deleted_at' => null
+        ]);
+
+        $this->assertNotNull(OrderItemModel::find($item->id));
+    }
+
+    public function test_order_items_are_deleted_when_order_is_force_deleted()
+    {
+        $customer = CustomerModel::factory()->create();
+        $product = ProductModel::factory()->create();
+
+        $order = OrderModel::create([
+            'customer_id' => $customer->id,
+            'status' => 'pending'
+        ]);
+
+        $item = OrderItemModel::create([
+            'order_id' => $order->id,
+            'product_id' => $product->id,
+            'quantity' => 2,
+            'unit_value' => 8.50
+        ]);
+
+        $order->forceDelete();
+
+        $this->assertDatabaseMissing('orders', ['id' => $order->id]);
+
+        $this->assertDatabaseMissing('order_items', ['id' => $item->id]);
+    }
+
+    public function test_order_has_many_items_relationship()
+    {
+        $order = OrderModel::make();
+        $relation = $order->items();
+
+        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\HasMany::class, $relation);
+        $this->assertEquals('order_id', $relation->getForeignKeyName());
+    }
+
+    public function test_order_item_belongs_to_order_relationship()
+    {
+        $orderItem = new OrderItemModel();
+        $relation = $orderItem->order();
+
+        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\BelongsTo::class, $relation);
+        $this->assertEquals('order_id', $relation->getForeignKeyName());
+    }
+
+    public function test_order_item_belongs_to_product_relationship()
+    {
+        $orderItem = new OrderItemModel();
+        $relation = $orderItem->product();
 
         $this->assertInstanceOf(\Illuminate\Database\Eloquent\Relations\BelongsTo::class, $relation);
         $this->assertEquals('product_id', $relation->getForeignKeyName());
+    }
+
+    public function test_order_item_can_retrieve_related_order()
+    {
+        $customer = CustomerModel::factory()->create();
+        $order = OrderModel::create([
+            'customer_id' => $customer->id,
+            'status' => 'pending',
+            'total_amount' => 0
+        ]);
+        $product = ProductModel::factory()->create();
+
+        $orderItem = OrderItemModel::create([
+            'order_id' => $order->id,
+            'product_id' => $product->id,
+            'quantity' => 2,
+            'unit_value' => 8.50,
+            'total_value' => 17.00
+        ]);
+
+        $retrievedOrder = $orderItem->order;
+
+        $this->assertInstanceOf(OrderModel::class, $retrievedOrder);
+        $this->assertEquals($order->id, $retrievedOrder->id);
+    }
+
+    public function test_order_item_can_retrieve_related_product()
+    {
+        $customer = CustomerModel::factory()->create();
+        $order = OrderModel::create([
+            'customer_id' => $customer->id,
+            'status' => 'pending',
+            'total_amount' => 0
+        ]);
+        $product = ProductModel::factory()->create();
+
+        $orderItem = OrderItemModel::create([
+            'order_id' => $order->id,
+            'product_id' => $product->id,
+            'quantity' => 2,
+            'unit_value' => 8.50,
+            'total_value' => 17.00
+        ]);
+
+        $retrievedProduct = $orderItem->product;
+
+        $this->assertInstanceOf(ProductModel::class, $retrievedProduct);
+        $this->assertEquals($product->id, $retrievedProduct->id);
     }
 }

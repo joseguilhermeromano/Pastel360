@@ -14,22 +14,43 @@ class OrderRequest extends FormRequest
     public function rules()
     {
         $rules = [
-            'product_id' => 'sometimes|integer|exists:products,id',
             'customer_id' => 'sometimes|integer|exists:customers,id',
-            'quantity' => 'sometimes|integer|min:1',
-            'unit_value' => 'sometimes|numeric|min:0',
-            'status' => 'sometimes|string|in:pending,approved,canceled,delivered',
-            'notes' => 'nullable|string|max:500'
+            'status' => 'sometimes|string|in:pending,approved,delivered,canceled',
+            'notes' => 'nullable|string|max:500',
+            'items' => 'sometimes|array|min:1',
+            'items.*.product_id' => 'sometimes|integer|exists:products,id',
+            'items.*.quantity' => 'sometimes|integer|min:1',
+            'items.*.unit_value' => 'sometimes|numeric|min:0.01'
         ];
 
         if ($this->isMethod('post')) {
-            $rules['product_id'] = 'required|integer|exists:products,id';
             $rules['customer_id'] = 'required|integer|exists:customers,id';
-            $rules['quantity'] = 'required|integer|min:1';
-            $rules['unit_value'] = 'required|numeric|min:0';
-            $rules['status'] = 'required|string|in:pending,approved,delivered,canceled';
+            $rules['status'] = 'required|string|in:pending,approved,in_preparation,ready,delivered,canceled';
+            $rules['items'] = 'required|array|min:1';
+            $rules['items.*.product_id'] = 'required|integer|exists:products,id';
+            $rules['items.*.quantity'] = 'required|integer|min:1';
+            $rules['items.*.unit_value'] = 'required|numeric|min:0.01';
         }
 
         return $rules;
+    }
+
+    public function messages()
+    {
+        return [
+            'customer_id.required' => 'O campo cliente é obrigatório.',
+            'customer_id.exists' => 'O cliente selecionado não existe.',
+            'status.required' => 'O campo status é obrigatório.',
+            'status.in' => 'Status deve ser: pending, approved, in_preparation, ready, delivered ou canceled.',
+            'items.required' => 'Pelo menos um item é obrigatório no pedido.',
+            'items.array' => 'Os items devem ser um array.',
+            'items.min' => 'Pelo menos um item é obrigatório no pedido.',
+            'items.*.product_id.required' => 'O produto é obrigatório para cada item.',
+            'items.*.product_id.exists' => 'Um dos produtos selecionados não existe.',
+            'items.*.quantity.required' => 'A quantidade é obrigatória para cada item.',
+            'items.*.quantity.min' => 'A quantidade deve ser no mínimo 1.',
+            'items.*.unit_value.required' => 'O valor unitário é obrigatório para cada item.',
+            'items.*.unit_value.min' => 'O valor unitário deve ser maior que zero.'
+        ];
     }
 }

@@ -11,12 +11,14 @@ use App\Repositories\Contracts\ProductRepositoryInterface;
  *     schema="Product",
  *     type="object",
  *     @OA\Property(property="id", type="integer", example=1),
- *     @OA\Property(property="name", type="string", example="Notebook Dell"),
- *     @OA\Property(property="price", type="number", format="float", example=2999.99),
- *     @OA\Property(property="photo", type="string", example="notebook.jpg"),
+ *     @OA\Property(property="name", type="string", example="Pastel de Carne"),
+ *     @OA\Property(property="description", type="string", example="Pastel de carne moída com temperos especiais"),
+ *     @OA\Property(property="price", type="number", format="float", example=8.50),
+ *     @OA\Property(property="photo", type="string", example="pastel-carne.jpg"),
  *     @OA\Property(property="stock", type="integer", example=50),
- *     @OA\Property(property="sku", type="string", example="DELL-NB-001"),
+ *     @OA\Property(property="sku", type="string", example="PASTEL-CARNE-001"),
  *     @OA\Property(property="enable", type="boolean", example=true),
+ *     @OA\Property(property="category", type="string", example="salgado"),
  *     @OA\Property(property="created_at", type="string", format="date-time"),
  *     @OA\Property(property="updated_at", type="string", format="date-time")
  * )
@@ -31,11 +33,11 @@ class ProductController extends Controller
     /**
      * @OA\Get(
      *     path="/api/products",
-     *     summary="Lista todos os produtos",
+     *     summary="Lista todos os pastéis",
      *     tags={"Products"},
      *     @OA\Response(
      *         response=200,
-     *         description="Lista de produtos",
+     *         description="Lista de pastéis",
      *         @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/Product"))
      *     )
      * )
@@ -49,23 +51,25 @@ class ProductController extends Controller
     /**
      * @OA\Post(
      *     path="/api/products",
-     *     summary="Cria um novo produto",
+     *     summary="Cria um novo pastel",
      *     tags={"Products"},
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
      *             required={"name","price","stock","sku"},
-     *             @OA\Property(property="name", type="string", example="Notebook Dell"),
-     *             @OA\Property(property="price", type="number", format="float", example=2999.99),
-     *             @OA\Property(property="photo", type="string", example="notebook.jpg"),
-     *             @OA\Property(property="stock", type="integer", example=50),
-     *             @OA\Property(property="sku", type="string", example="DELL-NB-001"),
-     *             @OA\Property(property="enable", type="boolean", example=true)
+     *             @OA\Property(property="name", type="string", example="Pastel de Queijo", description="Nome do pastel"),
+     *             @OA\Property(property="description", type="string", example="Pastel de queijo mussarela derretido", description="Descrição do pastel"),
+     *             @OA\Property(property="price", type="number", format="float", example=7.50, description="Preço do pastel"),
+     *             @OA\Property(property="photo", type="string", example="pastel-queijo.jpg", description="Foto do pastel"),
+     *             @OA\Property(property="stock", type="integer", example=30, description="Quantidade em estoque"),
+     *             @OA\Property(property="sku", type="string", example="PASTEL-QUEIJO-002", description="Código SKU do pastel"),
+     *             @OA\Property(property="enable", type="boolean", example=true, description="Disponível para venda"),
+     *             @OA\Property(property="category", type="string", example="salgado", description="Categoria: salgado, doce, especial")
      *         )
      *     ),
      *     @OA\Response(
      *         response=201,
-     *         description="Produto criado com sucesso",
+     *         description="Pastel criado com sucesso",
      *         @OA\JsonContent(ref="#/components/schemas/Product")
      *     ),
      *     @OA\Response(response=422, description="Validação falhou")
@@ -80,7 +84,7 @@ class ProductController extends Controller
     /**
      * @OA\Get(
      *     path="/api/products/{id}",
-     *     summary="Obtém um produto específico",
+     *     summary="Obtém um pastel específico",
      *     tags={"Products"},
      *     @OA\Parameter(
      *         name="id",
@@ -90,10 +94,10 @@ class ProductController extends Controller
      *     ),
      *     @OA\Response(
      *         response=200,
-     *         description="Produto encontrado",
+     *         description="Pastel encontrado",
      *         @OA\JsonContent(ref="#/components/schemas/Product")
      *     ),
-     *     @OA\Response(response=404, description="Produto não encontrado")
+     *     @OA\Response(response=404, description="Pastel não encontrado")
      * )
      */
     public function show(int $id): JsonResponse
@@ -105,7 +109,7 @@ class ProductController extends Controller
     /**
      * @OA\Put(
      *     path="/api/products/{id}",
-     *     summary="Atualiza um produto",
+     *     summary="Atualiza um pastel",
      *     tags={"Products"},
      *     @OA\Parameter(
      *         name="id",
@@ -116,20 +120,22 @@ class ProductController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             @OA\Property(property="name", type="string", example="Notebook Dell"),
-     *             @OA\Property(property="price", type="number", format="float", example=2999.99),
-     *             @OA\Property(property="photo", type="string", example="notebook.jpg"),
-     *             @OA\Property(property="stock", type="integer", example=50),
-     *             @OA\Property(property="sku", type="string", example="DELL-NB-001"),
-     *             @OA\Property(property="enable", type="boolean", example=true)
+     *             @OA\Property(property="name", type="string", example="Pastel de Frango", description="Nome do pastel"),
+     *             @OA\Property(property="description", type="string", example="Pastel de frango desfiado com catupiry", description="Descrição do pastel"),
+     *             @OA\Property(property="price", type="number", format="float", example=8.00, description="Preço do pastel"),
+     *             @OA\Property(property="photo", type="string", example="pastel-frango.jpg", description="Foto do pastel"),
+     *             @OA\Property(property="stock", type="integer", example=25, description="Quantidade em estoque"),
+     *             @OA\Property(property="sku", type="string", example="PASTEL-FRANGO-003", description="Código SKU do pastel"),
+     *             @OA\Property(property="enable", type="boolean", example=true, description="Disponível para venda"),
+     *             @OA\Property(property="category", type="string", example="salgado", description="Categoria: salgado, doce, especial")
      *         )
      *     ),
      *     @OA\Response(
      *         response=200,
-     *         description="Produto atualizado",
+     *         description="Pastel atualizado",
      *         @OA\JsonContent(ref="#/components/schemas/Product")
      *     ),
-     *     @OA\Response(response=404, description="Produto não encontrado"),
+     *     @OA\Response(response=404, description="Pastel não encontrado"),
      *     @OA\Response(response=422, description="Validação falhou")
      * )
      */
@@ -142,7 +148,7 @@ class ProductController extends Controller
     /**
      * @OA\Delete(
      *     path="/api/products/{id}",
-     *     summary="Exclui um produto",
+     *     summary="Exclui um pastel",
      *     tags={"Products"},
      *     @OA\Parameter(
      *         name="id",
@@ -152,9 +158,9 @@ class ProductController extends Controller
      *     ),
      *     @OA\Response(
      *         response=204,
-     *         description="Produto excluído com sucesso"
+     *         description="Pastel excluído com sucesso"
      *     ),
-     *     @OA\Response(response=404, description="Produto não encontrado")
+     *     @OA\Response(response=404, description="Pastel não encontrado")
      * )
      */
     public function destroy(int $id): JsonResponse

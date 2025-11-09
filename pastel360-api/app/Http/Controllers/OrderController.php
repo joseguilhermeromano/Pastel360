@@ -11,17 +11,43 @@ use App\Repositories\Contracts\OrderRepositoryInterface;
  *     schema="Order",
  *     type="object",
  *     @OA\Property(property="id", type="integer", example=1),
- *     @OA\Property(property="product_id", type="integer", example=1),
  *     @OA\Property(property="customer_id", type="integer", example=1),
- *     @OA\Property(property="quantity", type="integer", example=2),
- *     @OA\Property(property="unit_value", type="number", format="float", example=1500.00),
- *     @OA\Property(property="total_value", type="number", format="float", example=3000.00),
  *     @OA\Property(property="status", type="string", example="pending"),
- *     @OA\Property(property="notes", type="string", example="Entregar de manhã"),
- *     @OA\Property(property="customer", ref="#/components/schemas/Customer"),
- *     @OA\Property(property="product", ref="#/components/schemas/Product"),
+ *     @OA\Property(property="total_amount", type="number", format="float", example=45.50),
  *     @OA\Property(property="created_at", type="string", format="date-time"),
- *     @OA\Property(property="updated_at", type="string", format="date-time")
+ *     @OA\Property(property="updated_at", type="string", format="date-time"),
+ *     @OA\Property(
+ *         property="customer",
+ *         type="object",
+ *         @OA\Property(property="id", type="integer", example=1),
+ *         @OA\Property(property="name", type="string", example="José Romano"),
+ *         @OA\Property(property="email", type="string", example="jromano@email.com")
+ *     ),
+ *     @OA\Property(
+ *         property="items",
+ *         type="array",
+ *         @OA\Items(ref="#/components/schemas/OrderItem")
+ *     )
+ * )
+ *
+ * @OA\Schema(
+ *     schema="OrderItem",
+ *     type="object",
+ *     @OA\Property(property="id", type="integer", example=1),
+ *     @OA\Property(property="order_id", type="integer", example=1),
+ *     @OA\Property(property="product_id", type="integer", example=1),
+ *     @OA\Property(property="quantity", type="integer", example=3),
+ *     @OA\Property(property="unit_value", type="number", format="float", example=8.50),
+ *     @OA\Property(property="total_value", type="number", format="float", example=25.50),
+ *     @OA\Property(property="created_at", type="string", format="date-time"),
+ *     @OA\Property(property="updated_at", type="string", format="date-time"),
+ *     @OA\Property(
+ *         property="product",
+ *         type="object",
+ *         @OA\Property(property="id", type="integer", example=1),
+ *         @OA\Property(property="name", type="string", example="Pastel de Carne"),
+ *         @OA\Property(property="description", type="string", example="Pastel de carne moída com temperos especiais")
+ *     )
  * )
  */
 class OrderController extends Controller
@@ -34,7 +60,7 @@ class OrderController extends Controller
     /**
      * @OA\Get(
      *     path="/api/orders",
-     *     summary="Lista todos os pedidos",
+     *     summary="Lista todos os pedidos de pastéis",
      *     tags={"Orders"},
      *     @OA\Response(
      *         response=200,
@@ -52,24 +78,31 @@ class OrderController extends Controller
     /**
      * @OA\Post(
      *     path="/api/orders",
-     *     summary="Cria um novo pedido",
+     *     summary="Cria um novo pedido de pastéis",
      *     tags={"Orders"},
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             required={"product_id","customer_id","quantity","unit_value","total_value","status"},
-     *             @OA\Property(property="product_id", type="integer", example=1),
+     *             required={"customer_id","status","items"},
      *             @OA\Property(property="customer_id", type="integer", example=1),
-     *             @OA\Property(property="quantity", type="integer", example=2),
-     *             @OA\Property(property="unit_value", type="number", format="float", example=1500.00),
-     *             @OA\Property(property="total_value", type="number", format="float", example=3000.00),
-     *             @OA\Property(property="status", type="string", example="pending", enum={"pending", "approved", "canceled", "delivered"}),
-     *             @OA\Property(property="notes", type="string", example="Entregar de manhã")
+     *             @OA\Property(property="status", type="string", example="pending", enum={"pending", "approved", "in_preparation", "ready", "delivered", "canceled"}),
+     *             @OA\Property(property="notes", type="string", example="Sem cebola no pastel de carne"),
+     *             @OA\Property(
+     *                 property="items",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     required={"product_id","quantity","unit_value"},
+     *                     @OA\Property(property="product_id", type="integer", example=1, description="ID do pastel"),
+     *                     @OA\Property(property="quantity", type="integer", example=2, description="Quantidade de pastéis"),
+     *                     @OA\Property(property="unit_value", type="number", format="float", example=8.50, description="Preço unitário do pastel")
+     *                 )
+     *             )
      *         )
      *     ),
      *     @OA\Response(
      *         response=201,
-     *         description="Pedido criado com sucesso",
+     *         description="Pedido de pastéis criado com sucesso",
      *         @OA\JsonContent(ref="#/components/schemas/Order")
      *     ),
      *     @OA\Response(response=422, description="Validação falhou")
@@ -84,7 +117,7 @@ class OrderController extends Controller
     /**
      * @OA\Get(
      *     path="/api/orders/{id}",
-     *     summary="Obtém um pedido específico",
+     *     summary="Obtém um pedido específico de pastéis",
      *     tags={"Orders"},
      *     @OA\Parameter(
      *         name="id",
@@ -109,7 +142,7 @@ class OrderController extends Controller
     /**
      * @OA\Put(
      *     path="/api/orders/{id}",
-     *     summary="Atualiza um pedido",
+     *     summary="Atualiza um pedido de pastéis",
      *     tags={"Orders"},
      *     @OA\Parameter(
      *         name="id",
@@ -120,13 +153,20 @@ class OrderController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             @OA\Property(property="product_id", type="integer", example=1),
      *             @OA\Property(property="customer_id", type="integer", example=1),
-     *             @OA\Property(property="quantity", type="integer", example=2),
-     *             @OA\Property(property="unit_value", type="number", format="float", example=1500.00),
-     *             @OA\Property(property="total_value", type="number", format="float", example=3000.00),
-     *             @OA\Property(property="status", type="string", example="approved", enum={"pending", "approved", "canceled", "delivered"}),
-     *             @OA\Property(property="notes", type="string", example="Entregar de manhã")
+     *             @OA\Property(property="status", type="string", example="in_preparation", enum={"pending", "approved", "in_preparation", "ready", "delivered", "canceled"}),
+     *             @OA\Property(property="notes", type="string", example="Adicionar mais um pastel de queijo"),
+     *             @OA\Property(
+     *                 property="items",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer", example=1, description="ID do item (para atualização)"),
+     *                     @OA\Property(property="product_id", type="integer", example=2, description="ID do pastel"),
+     *                     @OA\Property(property="quantity", type="integer", example=3, description="Quantidade de pastéis"),
+     *                     @OA\Property(property="unit_value", type="number", format="float", example=7.50, description="Preço unitário do pastel")
+     *                 )
+     *             )
      *         )
      *     ),
      *     @OA\Response(
@@ -147,7 +187,7 @@ class OrderController extends Controller
     /**
      * @OA\Delete(
      *     path="/api/orders/{id}",
-     *     summary="Exclui um pedido",
+     *     summary="Exclui um pedido de pastéis",
      *     tags={"Orders"},
      *     @OA\Parameter(
      *         name="id",

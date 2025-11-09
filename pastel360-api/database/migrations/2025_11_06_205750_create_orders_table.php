@@ -13,21 +13,24 @@ return new class extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('product_id')
-                ->constrained('products')
-                ->onDelete('cascade')
-                ->onUpdate('cascade');
             $table->foreignId('customer_id')
                 ->constrained('customers')
-                ->onDelete('cascade')
-                ->onUpdate('cascade');
-            $table->integer('quantity')->default(1);
-            $table->decimal('unit_value', 10, 2);
-            $table->decimal('total_value', 10, 2);
-            $table->enum('status', ['pending', 'approved', 'delivered', 'cancelled'])->default('pending');
+                ->onUpdate('cascade')
+                ->onDelete('restrict');
+            $table->enum('status', [
+                'pending',
+                'approved',
+                'delivered',
+                'canceled'
+            ])->default('pending');
+            $table->decimal('total_amount', 10, 2)->default(0);
             $table->text('notes')->nullable();
             $table->timestamps();
             $table->softDeletes();
+
+            $table->index('customer_id');
+            $table->index('status');
+            $table->index('created_at');
         });
     }
 
