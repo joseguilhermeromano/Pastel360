@@ -75,7 +75,7 @@ Esta API permite o gerenciamento completo de uma pastelaria, incluindo cadastro 
 
 ## 📁 Estrutura do Projeto
 
-text
+```bash
 app/
 ├── Http/
 │ ├── Controllers/ # Controladores da API
@@ -103,6 +103,7 @@ config/ # Configurações da aplicação
 routes/ # Rotas da API
 public/ # Arquivos públicos
 storage/ # Arquivos de storage
+```
 
 ## 🚀 Instalação
 
@@ -133,7 +134,7 @@ php artisan key:generate
 Configure o banco de dados
 Edite o arquivo .env:
 
-env
+```bash
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
@@ -142,31 +143,40 @@ DB_USERNAME=seu_usuario
 DB_PASSWORD=sua_senha
 
 APP_TIMEZONE=America/Sao_Paulo
+```
+
 Execute as migrations
 
-bash
+```bash
 php artisan migrate
+```
+
 Popule o banco (opcional)
 
-bash
+```bash
 php artisan db:seed
+```
 
 ## ⚙️ Configuração
 
 Timezone
 A aplicação está configurada para o fuso horário de São Paulo:
 
-php
+```bash
 'timezone' => 'America/Sao_Paulo'
 Configurações Importantes
+```
+
 App Config (config/app.php):
 
-php
+```bash
 'name' => 'Pastelaria API',
 'env' => env('APP_ENV', 'production'),
 'debug' => env('APP_DEBUG', false),
 'timezone' => 'America/Sao_Paulo',
 'locale' => 'pt_BR',
+```
+
 Database Config:
 
 Soft Deletes em todas as entidades
@@ -189,14 +199,17 @@ Lá verá todas as méticas de cobertura de código.
 
 #### 🛍️ Produtos
 
-http
+```bash
 GET /api/products # Listar produtos
 POST /api/products # Criar produto
 GET /api/products/{id} # Buscar produto
 PUT /api/products/{id} # Atualizar produto
 DELETE /api/products/{id} # Excluir produto
+```
+
 Exemplo de criação:
 
+```bash
 json
 {
 "name": "Pastel de Carne",
@@ -208,6 +221,7 @@ json
 "enable": true,
 "category": "salgado"
 }
+```
 
 #### 👥 Clientes
 
@@ -228,6 +242,7 @@ PUT /api/orders/{id} # Atualizar pedido
 DELETE /api/orders/{id} # Excluir pedido
 Exemplo de criação de pedido:
 
+```bash
 json
 {
 "customer_id": 1,
@@ -246,6 +261,8 @@ json
 }
 ]
 }
+```
+
 Status dos Pedidos
 pending - Aguardando aprovação
 
@@ -317,12 +334,12 @@ php artisan l5-swagger:generate
 
 # Acessar documentação
 
-http://localhost:8000/api/documentation
+http://localhost/api/documentation
 Exemplos de Uso
 Criar um pedido:
 
-bash
-curl -X POST "http://localhost:8000/api/orders" \
+```bash
+curl -X POST "http://localhost/api/orders" \
  -H "Content-Type: application/json" \
  -d '{
 "customer_id": 1,
@@ -335,16 +352,22 @@ curl -X POST "http://localhost:8000/api/orders" \
 }
 ]
 }'
+```
+
 Atualizar status do pedido:
 
-bash
+```bash
 curl -X PUT "http://localhost:8000/api/orders/1" \
  -H "Content-Type: application/json" \
  -d '{
 "status": "in_preparation"
 }'
+```
+
 🐳 Deploy com Docker
 Docker Compose
+
+```bash
 yaml
 version: '3.8'
 services:
@@ -378,6 +401,9 @@ volumes:
 dbdata:
 Variáveis de Ambiente de Produção
 env
+```
+
+```bash
 APP_ENV=production
 APP_DEBUG=false
 APP_URL=https://sua-pastelaria.com
@@ -391,6 +417,8 @@ DB_PASSWORD=secret
 
 CACHE_DRIVER=redis
 QUEUE_CONNECTION=redis
+```
+
 🤝 Contribuição
 Fork o projeto
 
