@@ -175,7 +175,7 @@ Chaves estrangeiras com cascade
 
 Índices otimizados para performance
 
-Sonarqube
+## Sonarqube
 
 Dentro do diretório principal do projeto ./pastel360-api rode ./sonar.sh
 
