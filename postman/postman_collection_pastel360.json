@@ -1,0 +1,188 @@
+{
+    "info": {
+        "name": "PASTEL 360\u00ba API RESTFUL - Postman Collection",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Customers",
+            "item": [
+                {
+                    "name": "List Customers",
+                    "request": {
+                        "method": "GET",
+                        "url": "http://localhost/api/customers"
+                    }
+                },
+                {
+                    "name": "Create Customer",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"name\": \"Jos\\u00e9 Romano\", \"mail\": \"jromano@teste.com\", \"phone\": \"11999999999\", \"birthdate\": \"1996-01-01\", \"place\": \"Rua Principal\", \"number\": \"123\", \"zipcode\": \"12345678\", \"district\": \"Centro\", \"complement\": \"Apto 45\"}"
+                        },
+                        "url": "http://localhost/api/customers"
+                    }
+                },
+                {
+                    "name": "Get Customer by ID",
+                    "request": {
+                        "method": "GET",
+                        "url": "http://localhost/api/customers/1"
+                    }
+                },
+                {
+                    "name": "Update Customer",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"name\": \"Jos\\u00e9 Atualizado\"}"
+                        },
+                        "url": "http://localhost/api/customers/1"
+                    }
+                },
+                {
+                    "name": "Delete Customer",
+                    "request": {
+                        "method": "DELETE",
+                        "url": "http://localhost/api/customers/1"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Orders",
+            "item": [
+                {
+                    "name": "List Orders",
+                    "request": {
+                        "method": "GET",
+                        "url": "http://localhost/api/orders"
+                    }
+                },
+                {
+                    "name": "Create Order",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"customer_id\": 1, \"status\": \"pending\", \"items\": [{\"product_id\": 1, \"quantity\": 2, \"unit_value\": 8.5}]}"
+                        },
+                        "url": "http://localhost/api/orders"
+                    }
+                },
+                {
+                    "name": "Get Order by ID",
+                    "request": {
+                        "method": "GET",
+                        "url": "http://localhost/api/orders/1"
+                    }
+                },
+                {
+                    "name": "Update Order",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"status\": \"in_preparation\"}"
+                        },
+                        "url": "http://localhost/api/orders/1"
+                    }
+                },
+                {
+                    "name": "Delete Order",
+                    "request": {
+                        "method": "DELETE",
+                        "url": "http://localhost/api/orders/1"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Products",
+            "item": [
+                {
+                    "name": "List Products",
+                    "request": {
+                        "method": "GET",
+                        "url": "http://localhost/api/products"
+                    }
+                },
+                {
+                    "name": "Create Product",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"name\": \"Pastel de Queijo\", \"price\": 7.5, \"stock\": 30, \"sku\": \"PASTEL-QUEIJO-002\"}"
+                        },
+                        "url": "http://localhost/api/products"
+                    }
+                },
+                {
+                    "name": "Get Product by ID",
+                    "request": {
+                        "method": "GET",
+                        "url": "http://localhost/api/products/1"
+                    }
+                },
+                {
+                    "name": "Update Product",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\"name\": \"Pastel de Frango\", \"price\": 8.0}"
+                        },
+                        "url": "http://localhost/api/products/1"
+                    }
+                },
+                {
+                    "name": "Delete Product",
+                    "request": {
+                        "method": "DELETE",
+                        "url": "http://localhost/api/products/1"
+                    }
+                }
+            ]
+        }
+    ]
+}

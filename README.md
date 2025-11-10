@@ -55,9 +55,13 @@ Esta API permite o gerenciamento completo de uma pastelaria, incluindo cadastro 
 ### Backend
 
 - **PHP 8.2.29**
-- **Laravel 10.x**
+- **Laravel 12.x**
 - **MySQL 8.0+**
 - **SQLite** (para testes)
+- **Sonarqube**
+- **Xdebug**
+- **Nginx**
+- **Docker**
 
 ### Ferramentas de Desenvolvimento
 
@@ -119,19 +123,41 @@ Git
 Passo a Passo
 Clone o repositório
 
-bash
-git clone https://github.com/seu-usuario/pastelaria-api.git
-cd pastelaria-api
+```bash
+git clone https:/github.com/joseguilhermeromano/Pastel360.git
+
+cd pastel360-api
+```
+
+rode o script bash que criei (chamado sonar.sh):
+
+```bash
+./sonar.sh
+```
+
+Esse script starta cria as imagens/containers/volumes docker, starta os containers, recria o link simbólico do storage local, limpa os caches do laravel, roda todos os testes com phpunit e roda o sonarqube.
+
+Logo após, acesse em http://localhost:9999 com usuário admin e senha Pastel360@2025.
+
+Lá verá todas as méticas de cobertura de código.
+
 Instale as dependências
 
-bash
+```bash
+docker exec -it app bash
+#Aí dentro do container em /var/www/html execute
 composer install
+```
+
 Configure o ambiente
 
-bash
+```bash
 cp .env.example .env
 php artisan key:generate
+```
+
 Configure o banco de dados
+
 Edite o arquivo .env:
 
 ```bash
@@ -157,6 +183,19 @@ Popule o banco (opcional)
 php artisan db:seed
 ```
 
+Configure o mailable.io no seu .env:
+
+```bash
+MAIL_MAILER=smtp
+MAIL_HOST=sandbox.smtp.mailtrap.io
+MAIL_PORT=2525
+MAIL_USERNAME=6594541d37e2be
+MAIL_PASSWORD=335f6bc3ab59eb
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS="noreply@seudominio.com"
+MAIL_FROM_NAME="${APP_NAME}"
+```
+
 ## ⚙️ Configuração
 
 Timezone
@@ -170,7 +209,7 @@ Configurações Importantes
 App Config (config/app.php):
 
 ```bash
-'name' => 'Pastelaria API',
+'name' => 'PASTEL 360º API',
 'env' => env('APP_ENV', 'production'),
 'debug' => env('APP_DEBUG', false),
 'timezone' => 'America/Sao_Paulo',
@@ -184,14 +223,6 @@ Soft Deletes em todas as entidades
 Chaves estrangeiras com cascade
 
 Índices otimizados para performance
-
-## Sonarqube
-
-Dentro do diretório principal do projeto ./pastel360-api rode ./sonar.sh
-
-Logo após, acesse em http://localhost:9999 com usuário admin e senha Pastel360@2025.
-
-Lá verá todas as méticas de cobertura de código.
 
 ## 📡 Uso da API
 
@@ -212,14 +243,14 @@ Exemplo de criação:
 ```bash
 json
 {
-"name": "Pastel de Carne",
-"description": "Pastel de carne moída com temperos especiais",
-"price": 8.50,
-"photo": "pastel-carne.jpg",
-"stock": 50,
-"sku": "PASTEL-CARNE-001",
-"enable": true,
-"category": "salgado"
+    "name": "Pastel de Carne",
+    "description": "Pastel de carne moída com temperos especiais",
+    "price": 8.50,
+    "photo": "pastel-carne.jpg",
+    "stock": 50,
+    "sku": "PASTEL-CARNE-001",
+    "enable": true,
+    "category": "salgado"
 }
 ```
 
@@ -245,43 +276,47 @@ Exemplo de criação de pedido:
 ```bash
 json
 {
-"customer_id": 1,
-"status": "pending",
-"notes": "Sem cebola no pastel de carne",
-"items": [
-{
-"product_id": 1,
-"quantity": 2,
-"unit_value": 8.50
-},
-{
-"product_id": 2,
-"quantity": 1,
-"unit_value": 7.50
+  "customer_id": 1,
+  "status": "pending",
+  "notes": "Sem cebola no pastel de carne",
+  "items": [
+    {
+      "product_id": 1,
+      "quantity": 2,
+      "unit_value": 8.50
+    },
+    {
+      "product_id": 2,
+      "quantity": 1,
+      "unit_value": 7.50
+    }
+  ]
 }
-]
-}
+
 ```
 
 Status dos Pedidos
+
 pending - Aguardando aprovação
 
 approved - Pedido aprovado
-
-in_preparation - Em preparação
-
-ready - Pronto para entrega
 
 delivered - Entregue
 
 canceled - Cancelado
 
 🧪 Testes
+
 Executando os Testes
+
 Todos os testes:
 
-bash
+```bash
 php artisan test
+#ou
+./vendor/bin/phpunit
+```
+
 Testes específicos:
 
 bash
@@ -301,7 +336,9 @@ php artisan test --filter=OrderRequestTest
 # Com cobertura de código
 
 php artisan test --coverage --min=80
+
 Estrutura de Testes
+
 Testes Unitários:
 
 OrderModelTest - Testes da entidade Order
@@ -322,104 +359,53 @@ Cobertura Atual:
 
 ✅ Relacionamentos: 100%
 
-📚 Documentação
-Documentação da API
-A API possui documentação Swagger/OpenAPI disponível em:
+# 📚 Documentação da API
 
-bash
+## Gerar documentação
 
-# Gerar documentação
+Acesse o container:
+
+docker exec -it app bash
 
 php artisan l5-swagger:generate
 
-# Acessar documentação
+## Acessar documentação
 
 http://localhost/api/documentation
+
 Exemplos de Uso
+
 Criar um pedido:
 
 ```bash
 curl -X POST "http://localhost/api/orders" \
- -H "Content-Type: application/json" \
- -d '{
-"customer_id": 1,
-"status": "pending",
-"items": [
-{
-"product_id": 1,
-"quantity": 2,
-"unit_value": 8.50
-}
-]
-}'
+  -H "Content-Type: application/json" \
+  -d '{
+    "customer_id": 1,
+    "status": "pending",
+    "items": [
+      {
+        "product_id": 1,
+        "quantity": 2,
+        "unit_value": 8.50
+      }
+    ]
+  }'
+
 ```
 
 Atualizar status do pedido:
 
 ```bash
-curl -X PUT "http://localhost:8000/api/orders/1" \
- -H "Content-Type: application/json" \
- -d '{
-"status": "in_preparation"
-}'
+curl -X PUT "http://localhost/api/orders/1" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "status": "in_preparation"
+  }'
 ```
 
-🐳 Deploy com Docker
-Docker Compose
+# 🤝 Contribuição
 
-```bash
-yaml
-version: '3.8'
-services:
-app:
-build:
-context: .
-dockerfile: Dockerfile
-container_name: pastelaria-app
-restart: unless-stopped
-working_dir: /var/www/html
-volumes: - .:/var/www/html
-environment: - APP_ENV=production - APP_DEBUG=false - APP_TIMEZONE=America/Sao_Paulo
-
-nginx:
-image: nginx:alpine
-container_name: pastelaria-nginx
-restart: unless-stopped
-ports: - "8000:80"
-volumes: - .:/var/www/html - ./docker/nginx.conf:/etc/nginx/conf.d/default.conf
-
-db:
-image: mysql:8.0
-container_name: pastelaria-db
-restart: unless-stopped
-environment:
-MYSQL_DATABASE: pastelaria
-MYSQL_ROOT_PASSWORD: secret
-volumes: - dbdata:/var/lib/mysql
-
-volumes:
-dbdata:
-Variáveis de Ambiente de Produção
-env
-```
-
-```bash
-APP_ENV=production
-APP_DEBUG=false
-APP_URL=https://sua-pastelaria.com
-
-DB_CONNECTION=mysql
-DB_HOST=db
-DB_PORT=3306
-DB_DATABASE=pastelaria
-DB_USERNAME=root
-DB_PASSWORD=secret
-
-CACHE_DRIVER=redis
-QUEUE_CONNECTION=redis
-```
-
-🤝 Contribuição
 Fork o projeto
 
 Crie uma branch para sua feature (git checkout -b feature/AmazingFeature)
@@ -431,6 +417,7 @@ Push para a branch (git push origin feature/AmazingFeature)
 Abra um Pull Request
 
 Padrões de Código
+
 Seguir PSR-12
 
 Escrever testes para novas funcionalidades
@@ -439,15 +426,15 @@ Manter cobertura de código acima de 80%
 
 Documentar endpoints novos no Swagger
 
-📄 Licença
+# 📄 Licença
+
 Este projeto está sob a licença MIT. Veja o arquivo LICENSE para mais detalhes.
 
-🆘 Suporte
+# 🆘 Suporte
+
 Em caso de problemas:
 
 Verifique a documentação da API
-
-Consulte os logs em storage/logs/
 
 Abra uma issue no GitHub
 
