@@ -10,11 +10,9 @@ Uma API completa para gerenciamento de pedidos de uma pastelaria, desenvolvida e
 - [Estrutura do Projeto](#estrutura-do-projeto)
 - [Instalação](#instalação)
 - [Configuração](#configuração)
-- [SonarQube](#sonarqube)
 - [Uso da API](#uso-da-api)
 - [Testes](#testes)
 - [Documentação](#documentação)
-- [Deploy](#deploy)
 
 ## 🎯 Visão Geral
 
@@ -225,6 +223,10 @@ Chaves estrangeiras com cascade
 Índices otimizados para performance
 
 ## 📡 Uso da API
+
+### Importação das requests no POSTMAN
+
+Importe esse json no seu Postman: https://github.com/joseguilhermeromano/Pastel360/blob/main/postman/postman_collection_pastel360.json
 
 ### Endpoints Principais
 
