@@ -9,4 +9,7 @@ Route::middleware('api')->group(function () {
     Route::apiResource('customers', CustomerController::class);
     Route::apiResource('products', ProductController::class);
     Route::apiResource('orders', OrderController::class);
+
+    Route::get('products/image/{filename}', [ProductController::class, 'getImage'])
+        ->name('products.image');
 });

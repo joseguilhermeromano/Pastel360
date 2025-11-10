@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\JsonResponse;
 use App\Http\Requests\ProductRequest;
 use App\Repositories\Contracts\ProductRepositoryInterface;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * @OA\Schema(
@@ -77,7 +78,13 @@ class ProductController extends Controller
      */
     public function store(ProductRequest $request): JsonResponse
     {
-        $product = $this->productRepository->create($request->validated());
+        $data = $request->validated();
+
+        if ($request->hasFile('photo')) {
+            $data['photo'] = $this->uploadPhoto($request->file('photo'));
+        }
+
+        $product = $this->productRepository->create($data);
         return response()->json($product, 201);
     }
 
@@ -103,6 +110,11 @@ class ProductController extends Controller
     public function show(int $id): JsonResponse
     {
         $product = $this->productRepository->find($id);
+
+        if (!$product) {
+            return response()->json(['error' => 'Product not found'], 404);
+        }
+
         return response()->json($product);
     }
 
@@ -141,7 +153,18 @@ class ProductController extends Controller
      */
     public function update(ProductRequest $request, int $id): JsonResponse
     {
-        $product = $this->productRepository->update($id, $request->validated());
+        $data = $request->validated();
+
+        if ($request->hasFile('photo')) {
+            $data['photo'] = $this->uploadPhoto($request->file('photo'));
+
+            $existingProduct = $this->productRepository->find($id);
+            if ($existingProduct->photo) {
+                $this->deletePhoto($existingProduct->photo);
+            }
+        }
+
+        $product = $this->productRepository->update($id, $data);
         return response()->json($product);
     }
 
@@ -165,7 +188,44 @@ class ProductController extends Controller
      */
     public function destroy(int $id): JsonResponse
     {
+        $product = $this->productRepository->find($id);
+
+        if (!$product) {
+            return response()->json(['error' => 'Product not found'], 404);
+        }
+
+        if ($product->photo) {
+            $this->deletePhoto($product->photo);
+        }
+
         $this->productRepository->delete($id);
         return response()->json(null, 204);
+    }
+
+    private function uploadPhoto($photo): string
+    {
+        $fileName = time() . '_' . uniqid() . '.' . $photo->getClientOriginalExtension();
+
+        $photo->storeAs('', $fileName, 'products');
+
+        return $fileName;
+    }
+
+    private function deletePhoto(string $fileName): void
+    {
+        if (Storage::disk('products')->exists($fileName)) {
+            Storage::disk('products')->delete($fileName);
+        }
+    }
+
+    public function getImage(string $filename)
+    {
+        $path = storage_path('app/public/products/' . $filename);
+
+        if (!file_exists($path)) {
+            abort(404);
+        }
+
+        return response()->file($path);
     }
 }
