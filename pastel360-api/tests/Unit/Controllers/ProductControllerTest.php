@@ -165,7 +165,7 @@ class ProductControllerTest extends TestCase
         $fileMock->shouldReceive('getClientOriginalExtension')
             ->andReturn('jpg');
         $fileMock->shouldReceive('storeAs')
-            ->with('products', Mockery::pattern('/^PROD-PASTELTESTE3-[A-Z0-9]{8}\.jpg$/'), 'public')
+            ->with('products', Mockery::pattern('/^TEMP-SKU.jpg$/'), 'public')
             ->andReturn('products/PROD-PASTELTESTE3-ABC123.jpg');
 
         $this->requestMock->shouldReceive('file')
@@ -184,7 +184,7 @@ class ProductControllerTest extends TestCase
             ->with(Mockery::on(function ($data) {
                 return $data['name'] === 'Pastel Teste 3'
                     && isset($data['photo'])
-                    && preg_match('/^PROD-PASTELTESTE3-[A-Z0-9]{8}\.jpg$/', $data['photo']);
+                    && preg_match('/^TEMP-SKU.jpg$/', $data['photo']);
             }))
             ->andReturn($productMock);
 
@@ -251,7 +251,7 @@ class ProductControllerTest extends TestCase
         $fileMock->shouldReceive('getClientOriginalExtension')
             ->andReturn('png');
         $fileMock->shouldReceive('storeAs')
-            ->with('products', Mockery::pattern('/^PROD-PASTELATUALIZADOC-[A-Z0-9]{8}\.png$/'), 'public')
+            ->with('products', Mockery::pattern('/^TEMP-SKU.png$/'), 'public')
             ->andReturn('products/PROD-PASTELATUALIZADOC-DEF456.png');
 
         $this->requestMock->shouldReceive('file')
@@ -280,7 +280,7 @@ class ProductControllerTest extends TestCase
         $this->repositoryMock->shouldReceive('update')
             ->with($productId, Mockery::on(function ($data) {
                 return isset($data['photo'])
-                    && preg_match('/^PROD-PASTELATUALIZADOC-[A-Z0-9]{8}\.png$/', $data['photo']);
+                    && preg_match('/^TEMP-SKU.png$/', $data['photo']);
             }))
             ->andReturn($updatedProductMock);
 
@@ -393,8 +393,8 @@ class ProductControllerTest extends TestCase
         $fileMock->shouldReceive('getClientOriginalExtension')
             ->andReturn('jpg');
         $fileMock->shouldReceive('storeAs')
-            ->with('products', Mockery::pattern('/^PROD-PASTELTESTE-[A-Z0-9]{8}\.jpg$/'), 'public')
-            ->andReturn('products/PROD-PASTELTESTE-GHI789.jpg');
+            ->with('products', Mockery::pattern('/^TEMP-SKU.jpg$/'), 'public')
+            ->andReturn('products/TEMP-SKU.jpg');
 
         $this->requestMock->shouldReceive('hasFile')
             ->with('photo')
@@ -410,8 +410,7 @@ class ProductControllerTest extends TestCase
         $result = $method->invoke($this->controller, $this->requestMock, $validatedData);
 
         $this->assertStringContainsString('.jpg', $result);
-        $this->assertStringStartsWith('PROD-', $result);
-        $this->assertMatchesRegularExpression('/^PROD-PASTELTESTE-[A-Z0-9]{8}\.jpg$/', $result);
+        $this->assertMatchesRegularExpression('/^TEMP-SKU.jpg$/', $result);
     }
 
 
@@ -419,7 +418,7 @@ class ProductControllerTest extends TestCase
     {
         $productId = 1;
         $oldPhotoName = 'old-photo.jpg';
-        $sku = 'PROD-PRODUTOATUALIZADO-JKL012';
+        $sku = 'TEMP-SKU';
 
         $existingProduct = new ProductModel();
         $existingProduct->id = $productId;
@@ -431,8 +430,8 @@ class ProductControllerTest extends TestCase
         $newPhoto = Mockery::mock(UploadedFile::class);
         $newPhoto->shouldReceive('getClientOriginalExtension')->andReturn('jpg');
         $newPhoto->shouldReceive('storeAs')
-            ->with('products', Mockery::pattern('/^PROD-PRODUTOATUALIZADO-[A-Z0-9]{8}\.jpg$/'), 'public')
-            ->andReturn('products/PROD-PRODUTOATUALIZADO-JKL012.jpg');
+            ->with('products', Mockery::pattern('/^TEMP-SKU.jpg$/'), 'public')
+            ->andReturn('products/TEMP-SKU.jpg');
 
         $requestMock = Mockery::mock(ProductRequest::class);
         $requestMock->shouldReceive('validated')->andReturn([
@@ -464,7 +463,7 @@ class ProductControllerTest extends TestCase
             ->once()
             ->with($productId, Mockery::on(function ($data) {
                 return isset($data['photo'])
-                    && preg_match('/^PROD-PRODUTOATUALIZADO-[A-Z0-9]{8}\.jpg$/', $data['photo']);
+                    && preg_match('/^TEMP-SKU.jpg$/', $data['photo']);
             }))
             ->andReturn($existingProduct);
 

@@ -17,6 +17,7 @@ class ProductRequestTest extends TestCase
             'price' => 8.50,
             'stock' => 50,
             'enable' => true,
+            'category' => 'salgado'
         ];
 
         $request = new ProductRequest();
@@ -37,6 +38,7 @@ class ProductRequestTest extends TestCase
             'photo' => $file,
             'stock' => 50,
             'enable' => true,
+            'category' => 'salgado'
         ];
 
         $request = new ProductRequest();
@@ -74,7 +76,8 @@ class ProductRequestTest extends TestCase
             'price' => 8.50,
             'photo' => $invalidFile,
             'stock' => 50,
-            'enable' => true
+            'enable' => true,
+            'category' => 'salgado'
         ];
 
         $request = new ProductRequest();
@@ -95,7 +98,8 @@ class ProductRequestTest extends TestCase
             'price' => 8.50,
             'photo' => $largeFile,
             'stock' => 50,
-            'enable' => true
+            'enable' => true,
+            'category' => 'salgado'
         ];
 
         $request = new ProductRequest();
@@ -113,7 +117,8 @@ class ProductRequestTest extends TestCase
             'description' => 'Pastel de teste sem imagem',
             'price' => 8.50,
             'stock' => 50,
-            'enable' => true
+            'enable' => true,
+            'category' => 'salgado'
         ];
 
         $request = new ProductRequest();
@@ -128,7 +133,8 @@ class ProductRequestTest extends TestCase
         $data = [
             'name' => 'Pastel Atualizado',
             'price' => 9.50,
-            'stock' => 25
+            'stock' => 25,
+            'category' => 'salgado'
         ];
 
         $request = new ProductRequest();
@@ -146,7 +152,8 @@ class ProductRequestTest extends TestCase
             'name' => 'Pastel Atualizado',
             'price' => 9.00,
             'photo' => $file,
-            'stock' => 30
+            'stock' => 30,
+            'category' => 'salgado'
         ];
 
         $request = new ProductRequest();
@@ -170,6 +177,7 @@ class ProductRequestTest extends TestCase
             'photo.mimes' => 'A imagem deve ser JPEG, PNG, JPG ou GIF.',
             'photo.max' => 'A imagem não pode ser maior que 2MB.',
             'stock.required' => 'O estoque é obrigatório.',
+            'category.required' => 'O tipo/Categoria do produto é obrigatório.'
         ];
 
         $this->assertEquals($expectedMessages, $messages);

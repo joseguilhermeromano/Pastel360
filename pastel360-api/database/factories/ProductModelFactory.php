@@ -24,6 +24,7 @@ class ProductModelFactory extends Factory
             'stock' => $this->faker->numberBetween(1, 100),
             'photo' => $sku . '.jpg',
             'enable' => true,
+            'category' => $this->faker->randomElement(['salgado', 'doce', 'especial']),
         ];
     }
 }

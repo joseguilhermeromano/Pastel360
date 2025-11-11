@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class ProductModel extends Model
 {
@@ -26,10 +27,35 @@ class ProductModel extends Model
         'price' => 'decimal:2',
         'stock' => 'integer',
         'enable' => 'boolean',
+        'category' => 'string',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime'
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::created(function ($product) {
+            if (!empty($product->name)) {
+
+                $newSku = $product->getSkuAttribute(null);
+                $path = 'products/';
+
+                if ($product->photo && Storage::disk('public')->exists('products/' . $product->photo)) {
+                    $extension = pathinfo($product->photo, PATHINFO_EXTENSION);
+                    $newPhoto = $newSku . '.' . $extension;
+
+                    Storage::disk('public')->move($path . $product->photo, $path . $newPhoto);
+                    $product->photo = $newPhoto;
+                }
+
+                $product->sku = $newSku;
+                $product->saveQuietly();
+            }
+        });
+    }
 
     public function getSkuAttribute($value)
     {

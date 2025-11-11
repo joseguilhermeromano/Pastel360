@@ -596,11 +596,6 @@
                                         "type": "integer",
                                         "example": 30
                                     },
-                                    "sku": {
-                                        "description": "Código SKU do pastel",
-                                        "type": "string",
-                                        "example": "PASTEL-QUEIJO-002"
-                                    },
                                     "enable": {
                                         "description": "Disponível para venda",
                                         "type": "boolean",
@@ -715,11 +710,6 @@
                                         "type": "integer",
                                         "example": 25
                                     },
-                                    "sku": {
-                                        "description": "Código SKU do pastel",
-                                        "type": "string",
-                                        "example": "PASTEL-FRANGO-003"
-                                    },
                                     "enable": {
                                         "description": "Disponível para venda",
                                         "type": "boolean",
@@ -777,6 +767,69 @@
                     },
                     "404": {
                         "description": "Pastel não encontrado"
+                    }
+                }
+            }
+        },
+        "/api/products/image/{filename}": {
+            "get": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Obter imagem do produto",
+                "description": "Retorna a imagem do produto pelo nome do arquivo",
+                "operationId": "getProductImage",
+                "parameters": [
+                    {
+                        "name": "filename",
+                        "in": "path",
+                        "description": "Nome do arquivo da imagem",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "PROD-PASTELCARNE-ABC123.jpg"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Imagem retornada com sucesso",
+                        "content": {
+                            "image/jpeg": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "binary"
+                                }
+                            },
+                            "image/png": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "binary"
+                                }
+                            },
+                            "image/gif": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "binary"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Imagem não encontrada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Imagem não encontrada"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
                 }
             }

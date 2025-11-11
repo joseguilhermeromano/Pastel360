@@ -20,6 +20,7 @@ return new class extends Migration
             $table->integer('stock')->default(0);
             $table->string('sku')->unique()->nullable();
             $table->boolean('enable')->default(true);
+            $table->enum('category', ['salgado', 'doce', 'especial'])->default('salgado');
             $table->timestamps();
             $table->softDeletes();
         });

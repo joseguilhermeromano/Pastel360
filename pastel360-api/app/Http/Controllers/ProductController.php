@@ -66,7 +66,6 @@ class ProductController extends Controller
      *             @OA\Property(property="price", type="number", format="float", example=7.50, description="Preço do pastel"),
      *             @OA\Property(property="photo", type="string", example="pastel-queijo.jpg", description="Foto do pastel"),
      *             @OA\Property(property="stock", type="integer", example=30, description="Quantidade em estoque"),
-     *             @OA\Property(property="sku", type="string", example="PASTEL-QUEIJO-002", description="Código SKU do pastel"),
      *             @OA\Property(property="enable", type="boolean", example=true, description="Disponível para venda"),
      *             @OA\Property(property="category", type="string", example="salgado", description="Categoria: salgado, doce, especial")
      *         )
@@ -140,7 +139,6 @@ class ProductController extends Controller
      *             @OA\Property(property="price", type="number", format="float", example=8.00, description="Preço do pastel"),
      *             @OA\Property(property="photo", type="string", example="pastel-frango.jpg", description="Foto do pastel"),
      *             @OA\Property(property="stock", type="integer", example=25, description="Quantidade em estoque"),
-     *             @OA\Property(property="sku", type="string", example="PASTEL-FRANGO-003", description="Código SKU do pastel"),
      *             @OA\Property(property="enable", type="boolean", example=true, description="Disponível para venda"),
      *             @OA\Property(property="category", type="string", example="salgado", description="Categoria: salgado, doce, especial")
      *         )
@@ -209,11 +207,8 @@ class ProductController extends Controller
     {
         $filename = '';
 
-        $product = new ProductModel();
-        $product->name = $data['name'];
-
         if ($request->hasFile('photo')) {
-            $filename = $product->sku . '.' . $request->file('photo')->getClientOriginalExtension();
+            $filename = 'TEMP-SKU.' . $request->file('photo')->getClientOriginalExtension();
             $data['photo'] = $request->file('photo')->storeAs('products', $filename, 'public');
         }
 

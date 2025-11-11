@@ -26,6 +26,10 @@ rm -rf public/storage || exit 1
 echo "recriando link simbolico"
 docker compose exec app php artisan storage:link || exit 1
 
+echo "redefine permissao para storage/public"
+docker compose exec app chmod -R 775 storage/app/public/ || exit 1
+docker compose exec app chown www-data:www-data -R storage/app/public/ || exit 1
+
 echo "Executando PHPUnit com cobertura..."
 docker compose exec app vendor/bin/phpunit --coverage-clover=coverage.xml || exit 1
 

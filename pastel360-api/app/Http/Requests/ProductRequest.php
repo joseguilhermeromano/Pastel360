@@ -20,6 +20,7 @@ class ProductRequest extends FormRequest
             'photo' => 'sometimes|image|mimes:jpeg,png,jpg,gif|max:2048', // 2MB max
             'stock' => 'required|integer|min:0',
             'enable' => 'sometimes|boolean',
+            'category' => 'required|in:salgado,doce,especial',
         ];
 
         if ($this->isMethod('post') || $this->isMethod('patch')) {
@@ -39,6 +40,7 @@ class ProductRequest extends FormRequest
             'photo.mimes' => 'A imagem deve ser JPEG, PNG, JPG ou GIF.',
             'photo.max' => 'A imagem não pode ser maior que 2MB.',
             'stock.required' => 'O estoque é obrigatório.',
+            'category.required' => 'O tipo/Categoria do produto é obrigatório.'
         ];
     }
 
