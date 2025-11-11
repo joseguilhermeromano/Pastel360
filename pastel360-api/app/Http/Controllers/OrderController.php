@@ -57,7 +57,10 @@ class OrderController extends Controller
     public function __construct(
         private OrderRepositoryInterface $orderRepository,
         private OrderService $service
-    ) {}
+    ) {
+        $this->orderRepository = $orderRepository;
+        $this->service = $service;
+    }
 
     /**
      * @OA\Get(

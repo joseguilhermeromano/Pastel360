@@ -165,14 +165,18 @@ class ProductControllerTest extends TestCase
         $fileMock->shouldReceive('getClientOriginalExtension')
             ->andReturn('jpg');
         $fileMock->shouldReceive('storeAs')
-            ->with('', Mockery::type('string'), 'products')
-            ->andReturn(true);
+            ->with('products', Mockery::pattern('/^PROD-PASTELTESTE3-[A-Z0-9]{8}\.jpg$/'), 'public')
+            ->andReturn('products/PROD-PASTELTESTE3-ABC123.jpg');
 
         $this->requestMock->shouldReceive('file')
             ->with('photo')
             ->andReturn($fileMock);
 
-        $productMock = $this->createProductMock(['id' => 2, 'name' => 'Pastel Teste 3']);
+        $productMock = $this->createProductMock([
+            'id' => 2,
+            'name' => 'Pastel Teste 3',
+            'sku' => 'PROD-PASTELTESTE3-ABC123'
+        ]);
         $productMock->shouldReceive('toJson')
             ->andReturn(json_encode(['id' => 2, 'name' => 'Pastel Teste 3']));
 
@@ -180,7 +184,7 @@ class ProductControllerTest extends TestCase
             ->with(Mockery::on(function ($data) {
                 return $data['name'] === 'Pastel Teste 3'
                     && isset($data['photo'])
-                    && str_contains($data['photo'], '.jpg');
+                    && preg_match('/^PROD-PASTELTESTE3-[A-Z0-9]{8}\.jpg$/', $data['photo']);
             }))
             ->andReturn($productMock);
 
@@ -231,7 +235,7 @@ class ProductControllerTest extends TestCase
     {
         $productId = 2;
         $validatedData = [
-            'name' => 'Pastel Atualizado com Imagem teste',
+            'name' => 'Pastel Atualizado com Imagem',
             'price' => 10.50,
             'stock' => 30,
         ];
@@ -247,19 +251,25 @@ class ProductControllerTest extends TestCase
         $fileMock->shouldReceive('getClientOriginalExtension')
             ->andReturn('png');
         $fileMock->shouldReceive('storeAs')
-            ->with('', Mockery::type('string'), 'products')
-            ->andReturn(true);
+            ->with('products', Mockery::pattern('/^PROD-PASTELATUALIZADOC-[A-Z0-9]{8}\.png$/'), 'public')
+            ->andReturn('products/PROD-PASTELATUALIZADOC-DEF456.png');
 
         $this->requestMock->shouldReceive('file')
             ->with('photo')
             ->andReturn($fileMock);
 
-        $existingProductMock = $this->createProductMock(['id' => 2, 'name' => 'Pastel Atualizado com Imagem']);
-        $existingProductMock->shouldReceive('getAttribute')
-            ->with('photo')
-            ->andReturn('old-image.jpg');
+        $existingProductMock = $this->createProductMock([
+            'id' => 2,
+            'name' => 'Pastel Atualizado com Imagem',
+            'sku' => 'PROD-PASTELATUALIZADOC-DEF456',
+            'photo' => 'old-image.jpg'
+        ]);
 
-        $updatedProductMock = $this->createProductMock(['id' => 2, 'name' => 'Pastel Atualizado com Imagem']);
+        $updatedProductMock = $this->createProductMock([
+            'id' => 2,
+            'name' => 'Pastel Atualizado com Imagem',
+            'sku' => 'PROD-PASTELATUALIZADOC-DEF456'
+        ]);
         $updatedProductMock->shouldReceive('toJson')
             ->andReturn(json_encode(['id' => 2, 'name' => 'Pastel Atualizado com Imagem']));
 
@@ -269,7 +279,8 @@ class ProductControllerTest extends TestCase
 
         $this->repositoryMock->shouldReceive('update')
             ->with($productId, Mockery::on(function ($data) {
-                return isset($data['photo']) && str_contains($data['photo'], '.png');
+                return isset($data['photo'])
+                    && preg_match('/^PROD-PASTELATUALIZADOC-[A-Z0-9]{8}\.png$/', $data['photo']);
             }))
             ->andReturn($updatedProductMock);
 
@@ -372,39 +383,56 @@ class ProductControllerTest extends TestCase
 
     public function test_upload_photo_creates_filename_correctly()
     {
+        $validatedData = [
+            'name' => 'Pastel Teste',
+            'price' => 8.50,
+            'stock' => 50,
+        ];
+
         $fileMock = Mockery::mock(\Illuminate\Http\UploadedFile::class);
         $fileMock->shouldReceive('getClientOriginalExtension')
             ->andReturn('jpg');
         $fileMock->shouldReceive('storeAs')
-            ->with('', Mockery::type('string'), 'products')
+            ->with('products', Mockery::pattern('/^PROD-PASTELTESTE-[A-Z0-9]{8}\.jpg$/'), 'public')
+            ->andReturn('products/PROD-PASTELTESTE-GHI789.jpg');
+
+        $this->requestMock->shouldReceive('hasFile')
+            ->with('photo')
             ->andReturn(true);
+        $this->requestMock->shouldReceive('file')
+            ->with('photo')
+            ->andReturn($fileMock);
 
         $reflection = new ReflectionClass($this->controller);
         $method = $reflection->getMethod('uploadPhoto');
         $method->setAccessible(true);
 
-        $result = $method->invoke($this->controller, $fileMock);
+        $result = $method->invoke($this->controller, $this->requestMock, $validatedData);
 
         $this->assertStringContainsString('.jpg', $result);
-        $this->assertMatchesRegularExpression('/^\d+_[a-zA-Z0-9]+\.jpg$/', $result);
+        $this->assertStringStartsWith('PROD-', $result);
+        $this->assertMatchesRegularExpression('/^PROD-PASTELTESTE-[A-Z0-9]{8}\.jpg$/', $result);
     }
+
 
     public function test_update_replaces_existing_photo_and_deletes_old_one()
     {
         $productId = 1;
         $oldPhotoName = 'old-photo.jpg';
+        $sku = 'PROD-PRODUTOATUALIZADO-JKL012';
 
         $existingProduct = new ProductModel();
         $existingProduct->id = $productId;
         $existingProduct->name = 'Produto Teste';
         $existingProduct->photo = $oldPhotoName;
+        $existingProduct->sku = $sku;
         $existingProduct->exists = true;
 
         $newPhoto = Mockery::mock(UploadedFile::class);
         $newPhoto->shouldReceive('getClientOriginalExtension')->andReturn('jpg');
         $newPhoto->shouldReceive('storeAs')
-            ->with('', Mockery::type('string'), 'products')
-            ->andReturn('new-photo.jpg');
+            ->with('products', Mockery::pattern('/^PROD-PRODUTOATUALIZADO-[A-Z0-9]{8}\.jpg$/'), 'public')
+            ->andReturn('products/PROD-PRODUTOATUALIZADO-JKL012.jpg');
 
         $requestMock = Mockery::mock(ProductRequest::class);
         $requestMock->shouldReceive('validated')->andReturn([
@@ -417,44 +445,28 @@ class ProductControllerTest extends TestCase
             ->with('photo')
             ->andReturn($newPhoto);
 
-        $callOrder = [];
-
         Storage::shouldReceive('disk')
-            ->with('products')
-            ->andReturnUsing(function () use (&$callOrder) {
-                $callOrder[] = 'disk(products) called';
-                return Storage::getFacadeRoot();
-            });
-
+            ->with('public')
+            ->andReturnSelf();
         Storage::shouldReceive('exists')
             ->with($oldPhotoName)
-            ->andReturnUsing(function ($fileName) use (&$callOrder, $oldPhotoName) {
-                $callOrder[] = "exists($fileName) called";
-                return $fileName === $oldPhotoName;
-            });
-
+            ->andReturn(true);
         Storage::shouldReceive('delete')
             ->with($oldPhotoName)
-            ->andReturnUsing(function ($fileName) use (&$callOrder, $oldPhotoName) {
-                $callOrder[] = "delete($fileName) called";
-                return true;
-            });
+            ->andReturn(true);
 
         $this->repositoryMock->shouldReceive('find')
             ->once()
             ->with($productId)
-            ->andReturnUsing(function () use (&$callOrder, $existingProduct) {
-                $callOrder[] = 'repository->find called';
-                return $existingProduct;
-            });
+            ->andReturn($existingProduct);
 
         $this->repositoryMock->shouldReceive('update')
             ->once()
-            ->with($productId, Mockery::type('array'))
-            ->andReturnUsing(function () use (&$callOrder, $existingProduct) {
-                $callOrder[] = 'repository->update called';
-                return $existingProduct;
-            });
+            ->with($productId, Mockery::on(function ($data) {
+                return isset($data['photo'])
+                    && preg_match('/^PROD-PRODUTOATUALIZADO-[A-Z0-9]{8}\.jpg$/', $data['photo']);
+            }))
+            ->andReturn($existingProduct);
 
         $response = $this->controller->update($requestMock, $productId);
 

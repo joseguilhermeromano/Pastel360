@@ -51,24 +51,6 @@ class OrderModelFactory extends Factory
         });
     }
 
-    public function inPreparation()
-    {
-        return $this->state(function (array $attributes) {
-            return [
-                'status' => 'in_preparation',
-            ];
-        });
-    }
-
-    public function ready()
-    {
-        return $this->state(function (array $attributes) {
-            return [
-                'status' => 'ready',
-            ];
-        });
-    }
-
     public function delivered()
     {
         return $this->state(function (array $attributes) {

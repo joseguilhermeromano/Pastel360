@@ -23,7 +23,7 @@ class ProductRequest extends FormRequest
         ];
 
         if ($this->isMethod('post') || $this->isMethod('patch')) {
-            $rules['photo'] = 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048';
+            $rules['photo'] = 'required|image|mimes:jpeg,png,jpg,gif|max:2048';
         }
 
         return $rules;

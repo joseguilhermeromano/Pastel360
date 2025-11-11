@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
 use App\Http\Requests\ProductRequest;
+use App\Models\ProductModel;
 use App\Repositories\Contracts\ProductRepositoryInterface;
 use Illuminate\Support\Facades\Storage;
 
@@ -29,7 +30,9 @@ class ProductController extends Controller
 
     public function __construct(
         private ProductRepositoryInterface $productRepository
-    ) {}
+    ) {
+        $this->productRepository = $productRepository;
+    }
 
     /**
      * @OA\Get(
@@ -81,7 +84,7 @@ class ProductController extends Controller
         $data = $request->validated();
 
         if ($request->hasFile('photo')) {
-            $data['photo'] = $this->uploadPhoto($request->file('photo'));
+            $data['photo'] = $this->uploadPhoto($request, $data);
         }
 
         $product = $this->productRepository->create($data);
@@ -156,7 +159,7 @@ class ProductController extends Controller
         $data = $request->validated();
 
         if ($request->hasFile('photo')) {
-            $data['photo'] = $this->uploadPhoto($request->file('photo'));
+            $data['photo'] = $this->uploadPhoto($request, $data);
 
             $existingProduct = $this->productRepository->find($id);
             if ($existingProduct->photo) {
@@ -202,13 +205,19 @@ class ProductController extends Controller
         return response()->json(null, 204);
     }
 
-    private function uploadPhoto($photo): string
+    private function uploadPhoto(ProductRequest $request, $data): string
     {
-        $fileName = time() . '_' . uniqid() . '.' . $photo->getClientOriginalExtension();
+        $filename = '';
 
-        $photo->storeAs('', $fileName, 'products');
+        $product = new ProductModel();
+        $product->name = $data['name'];
 
-        return $fileName;
+        if ($request->hasFile('photo')) {
+            $filename = $product->sku . '.' . $request->file('photo')->getClientOriginalExtension();
+            $data['photo'] = $request->file('photo')->storeAs('products', $filename, 'public');
+        }
+
+        return $filename;
     }
 
     private function deletePhoto(string $fileName): void
@@ -218,6 +227,48 @@ class ProductController extends Controller
         }
     }
 
+    /**
+     * @OA\Get(
+     *     path="/api/products/image/{filename}",
+     *     summary="Obter imagem do produto",
+     *     description="Retorna a imagem do produto pelo nome do arquivo",
+     *     operationId="getProductImage",
+     *     tags={"Products"},
+     *     @OA\Parameter(
+     *         name="filename",
+     *         in="path",
+     *         required=true,
+     *         description="Nome do arquivo da imagem",
+     *         @OA\Schema(
+     *             type="string",
+     *             example="PROD-PASTELCARNE-ABC123.jpg"
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Imagem retornada com sucesso",
+     *         @OA\MediaType(
+     *             mediaType="image/jpeg",
+     *             @OA\Schema(type="string", format="binary")
+     *         ),
+     *         @OA\MediaType(
+     *             mediaType="image/png",
+     *             @OA\Schema(type="string", format="binary")
+     *         ),
+     *         @OA\MediaType(
+     *             mediaType="image/gif",
+     *             @OA\Schema(type="string", format="binary")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Imagem não encontrada",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Imagem não encontrada")
+     *         )
+     *     )
+     * )
+     */
     public function getImage(string $filename)
     {
         $path = storage_path('app/public/products/' . $filename);

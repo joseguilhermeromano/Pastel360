@@ -29,7 +29,9 @@ class CustomerController extends Controller
 
     public function __construct(
         private CustomerRepositoryInterface $customerRepository
-    ) {}
+    ) {
+        $this->customerRepository = $customerRepository;
+    }
 
     /**
      * @OA\Get(

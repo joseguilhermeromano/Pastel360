@@ -276,7 +276,7 @@ class ProductRequestTest extends TestCase
         $rules = $request->rules();
 
         $this->assertArrayHasKey('photo', $rules);
-        $this->assertEquals('nullable|image|mimes:jpeg,png,jpg,gif|max:2048', $rules['photo']);
+        $this->assertEquals('required|image|mimes:jpeg,png,jpg,gif|max:2048', $rules['photo']);
     }
 
     public function test_photo_rules_are_included_for_patch_method()
@@ -286,7 +286,7 @@ class ProductRequestTest extends TestCase
         $rules = $request->rules();
 
         $this->assertArrayHasKey('photo', $rules);
-        $this->assertEquals('nullable|image|mimes:jpeg,png,jpg,gif|max:2048', $rules['photo']);
+        $this->assertEquals('required|image|mimes:jpeg,png,jpg,gif|max:2048', $rules['photo']);
     }
 
     public function test_product_request_authorize_allows_access()
